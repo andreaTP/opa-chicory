@@ -4,11 +4,11 @@ import com.dylibso.chicory.runtime.HostFunction;
 import com.dylibso.chicory.runtime.HostImports;
 import com.dylibso.chicory.runtime.HostMemory;
 import com.dylibso.chicory.runtime.Instance;
+import com.dylibso.chicory.runtime.Memory;
 import com.dylibso.chicory.runtime.Module;
 import com.dylibso.chicory.wasm.types.Value;
 import com.dylibso.chicory.wasm.types.ValueType;
-
-import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 // Low level bindings to OPA
@@ -16,7 +16,7 @@ import java.util.List;
 public class OpaWasm {
     private final Instance instance;
 
-    public OpaWasm(OpaImports imports, File file) {
+    public OpaWasm(OpaImports imports, InputStream is) {
         // Imports
         HostMemory memory = new HostMemory("env", "memory", imports.memory());
         HostFunction opaAbort =
@@ -42,7 +42,11 @@ public class OpaWasm {
         HostFunction opaBuiltin0 =
                 new HostFunction(
                         (Instance instance, Value... args) -> {
-                            return new Value[] { Value.i32(imports.opaBuiltin0(instance, args[0].asInt(), args[1].asInt())) };
+                            return new Value[] {
+                                Value.i32(
+                                        imports.opaBuiltin0(
+                                                instance, args[0].asInt(), args[1].asInt()))
+                            };
                         },
                         "env",
                         "opa_builtin0",
@@ -51,7 +55,14 @@ public class OpaWasm {
         HostFunction opaBuiltin1 =
                 new HostFunction(
                         (Instance instance, Value... args) -> {
-                            return new Value[] { Value.i32(imports.opaBuiltin1(instance, args[0].asInt(), args[1].asInt(), args[2].asInt())) };
+                            return new Value[] {
+                                Value.i32(
+                                        imports.opaBuiltin1(
+                                                instance,
+                                                args[0].asInt(),
+                                                args[1].asInt(),
+                                                args[2].asInt()))
+                            };
                         },
                         "env",
                         "opa_builtin1",
@@ -60,7 +71,15 @@ public class OpaWasm {
         HostFunction opaBuiltin2 =
                 new HostFunction(
                         (Instance instance, Value... args) -> {
-                            return new Value[] { Value.i32(imports.opaBuiltin2(instance, args[0].asInt(), args[1].asInt(), args[2].asInt(), args[3].asInt())) };
+                            return new Value[] {
+                                Value.i32(
+                                        imports.opaBuiltin2(
+                                                instance,
+                                                args[0].asInt(),
+                                                args[1].asInt(),
+                                                args[2].asInt(),
+                                                args[3].asInt()))
+                            };
                         },
                         "env",
                         "opa_builtin2",
@@ -69,32 +88,72 @@ public class OpaWasm {
         HostFunction opaBuiltin3 =
                 new HostFunction(
                         (Instance instance, Value... args) -> {
-                            return new Value[] { Value.i32(imports.opaBuiltin3(instance, args[0].asInt(), args[1].asInt(), args[2].asInt(), args[3].asInt(), args[4].asInt())) };
+                            return new Value[] {
+                                Value.i32(
+                                        imports.opaBuiltin3(
+                                                instance,
+                                                args[0].asInt(),
+                                                args[1].asInt(),
+                                                args[2].asInt(),
+                                                args[3].asInt(),
+                                                args[4].asInt()))
+                            };
                         },
                         "env",
                         "opa_builtin3",
-                        List.of(ValueType.I32, ValueType.I32, ValueType.I32, ValueType.I32, ValueType.I32),
+                        List.of(
+                                ValueType.I32,
+                                ValueType.I32,
+                                ValueType.I32,
+                                ValueType.I32,
+                                ValueType.I32),
                         List.of(ValueType.I32));
         HostFunction opaBuiltin4 =
                 new HostFunction(
                         (Instance instance, Value... args) -> {
-                            return new Value[] { Value.i32(imports.opaBuiltin4(instance, args[0].asInt(), args[1].asInt(), args[2].asInt(), args[3].asInt(), args[4].asInt(), args[5].asInt())) };
+                            return new Value[] {
+                                Value.i32(
+                                        imports.opaBuiltin4(
+                                                instance,
+                                                args[0].asInt(),
+                                                args[1].asInt(),
+                                                args[2].asInt(),
+                                                args[3].asInt(),
+                                                args[4].asInt(),
+                                                args[5].asInt()))
+                            };
                         },
                         "env",
                         "opa_builtin4",
-                        List.of(ValueType.I32, ValueType.I32, ValueType.I32, ValueType.I32, ValueType.I32, ValueType.I32),
+                        List.of(
+                                ValueType.I32,
+                                ValueType.I32,
+                                ValueType.I32,
+                                ValueType.I32,
+                                ValueType.I32,
+                                ValueType.I32),
                         List.of(ValueType.I32));
 
-        instance = Module.builder(file)
-                .withHostImports(
-                        HostImports.builder()
-                                .addMemory(memory)
-                                .addFunction(opaAbort)
-                                .addFunction(opaPrintln)
-                                .addFunction(opaBuiltin0, opaBuiltin1, opaBuiltin2, opaBuiltin3, opaBuiltin4)
-                                .build())
-                .build()
-                .instantiate();
+        instance =
+                Module.builder(is)
+                        .withHostImports(
+                                HostImports.builder()
+                                        .addMemory(memory)
+                                        .addFunction(opaAbort)
+                                        .addFunction(opaPrintln)
+                                        .addFunction(
+                                                opaBuiltin0,
+                                                opaBuiltin1,
+                                                opaBuiltin2,
+                                                opaBuiltin3,
+                                                opaBuiltin4)
+                                        .build())
+                        .build()
+                        .instantiate();
+    }
+
+    public Memory memory() {
+        return instance.memory();
     }
 
     // exports
@@ -111,9 +170,7 @@ public class OpaWasm {
      * Evaluates the loaded policy with the provided evaluation context. The return value is reserved for future use.
      */
     public OpaErrorCode eval(int ctxAddr) {
-        return OpaErrorCode.fromValue(
-                instance.export("eval").apply(Value.i32(ctxAddr))[0].asInt()
-        );
+        return OpaErrorCode.fromValue(instance.export("eval").apply(Value.i32(ctxAddr))[0].asInt());
     }
 
     /*
@@ -155,7 +212,8 @@ public class OpaWasm {
      * Set the data value to use during evaluation. This should be called before each eval() call. If the data value is not set before evaluation, references to base data documents produce no results (i.e., they are undefined.)
      */
     public void opaEvalCtxSetEntrypoint(int ctxAddr, int entrypointId) {
-        instance.export("opa_eval_ctx_set_entrypoint").apply(Value.i32(ctxAddr), Value.i32(entrypointId));
+        instance.export("opa_eval_ctx_set_entrypoint")
+                .apply(Value.i32(ctxAddr), Value.i32(entrypointId));
     }
 
     /*
@@ -190,7 +248,9 @@ public class OpaWasm {
      * The same as opa_json_parse except Rego set literals are supported.
      */
     public int opaValueParse(int addr, int size) {
-        return instance.export("opa_value_parse").apply(Value.i32(addr), Value.i32(size))[0].asInt();
+        return instance.export("opa_value_parse")
+                .apply(Value.i32(addr), Value.i32(size))[0]
+                .asInt();
     }
 
     /*
@@ -226,11 +286,12 @@ public class OpaWasm {
      */
     public OpaErrorCode opaValueAddPath(int baseValueAddr, int pathValueAddr, int valueAddr) {
         return OpaErrorCode.fromValue(
-                instance.export("opa_value_add_path").apply(
-                Value.i32(baseValueAddr),
-                Value.i32(pathValueAddr),
-                Value.i32(valueAddr)
-        )[0].asInt());
+                instance.export("opa_value_add_path")
+                        .apply(
+                                Value.i32(baseValueAddr),
+                                Value.i32(pathValueAddr),
+                                Value.i32(valueAddr))[0]
+                        .asInt());
     }
 
     /*
@@ -238,10 +299,9 @@ public class OpaWasm {
      */
     public OpaErrorCode opaValueRemovePath(int baseValueAddr, int pathValueAddr) {
         return OpaErrorCode.fromValue(
-                instance.export("opa_value_remove_path").apply(
-                        Value.i32(baseValueAddr),
-                        Value.i32(pathValueAddr)
-                )[0].asInt());
+                instance.export("opa_value_remove_path")
+                        .apply(Value.i32(baseValueAddr), Value.i32(pathValueAddr))[0]
+                        .asInt());
     }
 
     /*
@@ -275,18 +335,19 @@ public class OpaWasm {
     /*
      * One-off policy evaluation method. Its arguments are everything needed to evaluate: entrypoint, address of data in memory, address and length of input JSON string in memory, heap address to use, and the output format (0 is JSON, 1 is “value”, i.e. serialized Rego values). The first argument is reserved for future use and must be 0. Returns the address to the serialised result value.
      */
-    public void opaEval(int entrypointId, int data, int input, int inputLen, int heapPtr, int format) {
+    public void opaEval(
+            int entrypointId, int data, int input, int inputLen, int heapPtr, int format) {
         if (format != 0 && format != 1) {
             throw new IllegalArgumentException("Format must be 0: JSON or 1: \"value\"");
         }
-        instance.export("opa_heap_blocks_clear").apply(
-                Value.i32(0), // reserved for future use
-                Value.i32(entrypointId),
-                Value.i32(data),
-                Value.i32(input),
-                Value.i32(inputLen),
-                Value.i32(heapPtr),
-                Value.i32(format)
-        );
+        instance.export("opa_heap_blocks_clear")
+                .apply(
+                        Value.i32(0), // reserved for future use
+                        Value.i32(entrypointId),
+                        Value.i32(data),
+                        Value.i32(input),
+                        Value.i32(inputLen),
+                        Value.i32(heapPtr),
+                        Value.i32(format));
     }
 }

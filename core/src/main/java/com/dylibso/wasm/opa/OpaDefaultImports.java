@@ -9,6 +9,7 @@ public class OpaDefaultImports implements OpaImports {
 
     // hold a reference to the runtime memory
     private final Memory memory = new Memory(new MemoryLimits(10, 100));
+
     public Memory memory() {
         return memory;
     }
@@ -38,18 +39,16 @@ public class OpaDefaultImports implements OpaImports {
     @Override
     public int opaBuiltin2(Instance instance, int builtinId, int ctx, int _1, int _2) {
         throw new RuntimeException("opa_builtin2 - not implemented");
-
     }
 
     @Override
     public int opaBuiltin3(Instance instance, int builtinId, int ctx, int _1, int _2, int _3) {
         throw new RuntimeException("opa_builtin3 - not implemented");
-
     }
 
     @Override
-    public int opaBuiltin4(Instance instance, int builtinId, int ctx, int _1, int _2, int _3, int _4) {
+    public int opaBuiltin4(
+            Instance instance, int builtinId, int ctx, int _1, int _2, int _3, int _4) {
         throw new RuntimeException("opa_builtin4 - not implemented");
-
     }
 }
