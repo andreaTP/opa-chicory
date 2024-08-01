@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 // final user API
 // directly porting:
@@ -42,6 +44,19 @@ public class Opa {
             this.dataHeapPtr = this.baseHeapPtr;
             this.dataAddr = -1;
             wasm.opaHeapPtrSet(this.dataHeapPtr);
+
+            // map the builtins
+            try {
+                var mappings = new HashMap<String, Integer>();
+                var fields = mapper.readTree(dumpJson(wasm.builtins())).fields();
+                while (fields.hasNext()) {
+                    var field = fields.next();
+                    mappings.put(field.getKey(), field.getValue().intValue());
+                }
+                wasm.imports().initializeBuiltins(mappings);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         public OpaPolicy entrypoint(int entrypoint) {
