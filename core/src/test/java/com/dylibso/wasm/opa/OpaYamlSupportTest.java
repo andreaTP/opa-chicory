@@ -69,7 +69,7 @@ public class OpaYamlSupportTest {
 
     @Test
     public void shouldMarshalYaml() {
-        var result = policy.entrypoint("yaml/support/canMarshalYAML").evaluate("[]");
+        var result = policy.entrypoint("yaml/support/canMarshalYAML").evaluate("\" invalid??? \"");
         System.out.println("Result: " + result);
     }
     //    it("should marshal yaml", () => {

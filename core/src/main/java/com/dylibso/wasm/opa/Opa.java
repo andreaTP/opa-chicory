@@ -71,12 +71,16 @@ public class Opa {
         public static int loadJson(OpaWasm wasm, String data) {
             var dataStrAddr = wasm.opaMalloc(data.length());
             wasm.memory().writeCString(dataStrAddr, data);
-            return wasm.opaJsonParse(dataStrAddr, data.length());
+            var dstAddr = wasm.opaJsonParse(dataStrAddr, data.length());
+            wasm.opaFree(dataStrAddr);
+            return dstAddr;
         }
 
         public static String dumpJson(OpaWasm wasm, int addr) {
             int resultStrAddr = wasm.opaJsonDump(addr);
-            return wasm.memory().readCString(resultStrAddr);
+            var result = wasm.memory().readCString(resultStrAddr);
+            wasm.opaFree(resultStrAddr);
+            return result;
         }
 
         // data MUST be a serializable object or ArrayBuffer, which assumed to be a well-formed

@@ -11,10 +11,11 @@ public class Utils {
         JsonNode json;
         try {
             json = objectMapper.readTree(jsonStr);
+            System.out.println("DEBUG: " + objectMapper.writeValueAsString(json));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("DEBUG: " + json);
+
         return json.elements().next().findValue("result");
     }
 
