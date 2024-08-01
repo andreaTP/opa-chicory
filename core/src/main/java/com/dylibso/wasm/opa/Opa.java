@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Map;
 
 // final user API
 // directly porting:
@@ -48,7 +47,7 @@ public class Opa {
             // map the builtins
             try {
                 var mappings = new HashMap<String, Integer>();
-                var fields = mapper.readTree(dumpJson(wasm.builtins())).fields();
+                var fields = mapper.readTree(dumpJson(wasm, wasm.builtins())).fields();
                 while (fields.hasNext()) {
                     var field = fields.next();
                     mappings.put(field.getKey(), field.getValue().intValue());
@@ -69,26 +68,22 @@ public class Opa {
             return this;
         }
 
-        private int loadJson(String data) {
+        public static int loadJson(OpaWasm wasm, String data) {
             var dataStrAddr = wasm.opaMalloc(data.length());
             wasm.memory().writeCString(dataStrAddr, data);
-            var dataAddr = wasm.opaJsonParse(dataStrAddr, data.length());
-            wasm.opaFree(dataStrAddr);
-            return dataAddr;
+            return wasm.opaJsonParse(dataStrAddr, data.length());
         }
 
-        private String dumpJson(int addr) {
+        public static String dumpJson(OpaWasm wasm, int addr) {
             int resultStrAddr = wasm.opaJsonDump(addr);
-            var resultStr = wasm.memory().readCString(resultStrAddr);
-            wasm.opaFree(resultStrAddr);
-            return resultStr;
+            return wasm.memory().readCString(resultStrAddr);
         }
 
         // data MUST be a serializable object or ArrayBuffer, which assumed to be a well-formed
         // stringified JSON
         public OpaPolicy data(String data) {
             wasm.opaHeapPtrSet(this.baseHeapPtr);
-            this.dataAddr = loadJson(data);
+            this.dataAddr = loadJson(wasm, data);
             this.dataHeapPtr = wasm.opaHeapPtrGet();
             return this;
         }
@@ -105,16 +100,13 @@ public class Opa {
                 }
             }
 
-            this.inputAddr = loadJson(input);
+            this.inputAddr = loadJson(wasm, input);
             return this;
         }
 
         public int findEntrypoint(String name) {
-            var x = dumpJson(wasm.entrypoints());
             try {
-                var json = dumpJson(wasm.entrypoints());
-                // So far, this is the only place we actually use Jackson, let's review if it's
-                // really needed at the end
+                var json = dumpJson(wasm, wasm.entrypoints());
                 var entrypoints = mapper.readTree(json);
                 if (!entrypoints.has(name)) {
                     throw new IllegalArgumentException(
@@ -146,19 +138,13 @@ public class Opa {
             }
 
             this.resultAddr = wasm.opaEvalCtxGetResult(ctxAddr);
-            var result = dumpJson(resultAddr);
+            var result = dumpJson(wasm, resultAddr);
             return result;
         }
 
         public String evaluate(String input) {
             input(input);
             return evaluate();
-        }
-
-        private void free(int addr) {
-            if (addr != -1) {
-                wasm.opaValueFree(addr);
-            }
         }
     }
 

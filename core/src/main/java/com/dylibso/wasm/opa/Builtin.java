@@ -1,42 +1,41 @@
 package com.dylibso.wasm.opa;
 
-import com.dylibso.chicory.runtime.Instance;
-
 public class Builtin {
-    private Builtin() {};
+    private Builtin() {}
+    ;
 
     public interface IBuiltin {
         String name();
 
-        default int asBuiltin0(Instance instance) {
+        default int asBuiltin0(OpaWasm instance) {
             throw new RuntimeException("opa_builtin - " + name() + " doesn't implement builtin0");
         }
 
-        default int asBuiltin1(Instance instance, int _1) {
+        default int asBuiltin1(OpaWasm instance, int _1) {
             throw new RuntimeException("opa_builtin - " + name() + " doesn't implement builtin1");
         }
 
-        default int asBuiltin2(Instance instance, int _1, int _2) {
+        default int asBuiltin2(OpaWasm instance, int _1, int _2) {
             throw new RuntimeException("opa_builtin - " + name() + " doesn't implement builtin2");
         }
 
-        default int asBuiltin3(Instance instance, int _1, int _2, int _3) {
+        default int asBuiltin3(OpaWasm instance, int _1, int _2, int _3) {
             throw new RuntimeException("opa_builtin - " + name() + " doesn't implement builtin3");
         }
 
-        default int asBuiltin4(Instance instance, int _1, int _2, int _3, int _4) {
+        default int asBuiltin4(OpaWasm instance, int _1, int _2, int _3, int _4) {
             throw new RuntimeException("opa_builtin - " + name() + " doesn't implement builtin4");
         }
     }
 
     @FunctionalInterface
     public interface AsBuiltin0 {
-        int apply(Instance instance);
+        int apply(OpaWasm instance);
     }
 
     @FunctionalInterface
     public interface AsBuiltin1 {
-        int apply(Instance instance, int _1);
+        int apply(OpaWasm instance, int _1);
     }
 
     public class Builtin0 implements IBuiltin {
@@ -54,7 +53,7 @@ public class Builtin {
         }
 
         @Override
-        public int asBuiltin0(Instance instance) {
+        public int asBuiltin0(OpaWasm instance) {
             return fn.apply(instance);
         }
     }
@@ -74,7 +73,7 @@ public class Builtin {
         }
 
         @Override
-        public int asBuiltin1(Instance instance, int _1) {
+        public int asBuiltin1(OpaWasm instance, int _1) {
             return fn.apply(instance, _1);
         }
     }

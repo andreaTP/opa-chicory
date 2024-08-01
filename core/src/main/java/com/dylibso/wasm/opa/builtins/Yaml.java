@@ -1,38 +1,66 @@
 package com.dylibso.wasm.opa.builtins;
 
-import com.dylibso.chicory.runtime.Instance;
-import com.dylibso.wasm.opa.Builtin;
+import static com.dylibso.wasm.opa.Opa.OpaPolicy.dumpJson;
+import static com.dylibso.wasm.opa.Opa.OpaPolicy.loadJson;
 
-import java.util.List;
+import com.dylibso.wasm.opa.Builtin;
+import com.dylibso.wasm.opa.OpaWasm;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 
 public class Yaml {
 
-    public static final Builtin.Builtin1 isValid = new Builtin.Builtin1("yaml.is_valid",
-            (Instance instance, int strAddr) -> {
-                System.out.println("YAML is valid");
-                return 1;
-            });
+    public static ObjectMapper jsonMapper = new ObjectMapper();
+    public static ObjectMapper yamlMapper =
+            new ObjectMapper(
+                    new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
 
-    public static final Builtin.Builtin1 unmarshal = new Builtin.Builtin1("yaml.unmarshal",
-            (Instance instance, int strAddr) -> {
-        System.out.println("YAML unmarshal " + strAddr);
-        var x = instance.memory().readCString(strAddr);
-                System.out.println("YAML unmarshal " + x.length());
-        System.out.println("YAML unmarshal " + x);
-        return 1;
-    });
+    public static final Builtin.Builtin1 isValid =
+            new Builtin.Builtin1(
+                    "yaml.is_valid",
+                    (OpaWasm instance, int strAddr) -> {
+                        var str = dumpJson(instance, strAddr);
+                        try {
+                            yamlMapper.readTree(str);
+                            // true - is valid
+                            return loadJson(instance, jsonMapper.writeValueAsString(true));
+                        } catch (JsonProcessingException e) {
+                            try {
+                                return loadJson(instance, jsonMapper.writeValueAsString(false));
+                            } catch (JsonProcessingException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    });
 
-    public static final Builtin.Builtin1 marshal = new Builtin.Builtin1("yaml.marshal",
-            (Instance instance, int strAddr) -> {
-                System.out.println("YAML marshal");
-                return 1;
-            });
+    public static final Builtin.Builtin1 unmarshal =
+            new Builtin.Builtin1(
+                    "yaml.unmarshal",
+                    (OpaWasm instance, int strAddr) -> {
+                        var str = dumpJson(instance, strAddr);
+                        try {
+                            var tree = yamlMapper.readTree(str);
+                            return loadJson(instance, jsonMapper.writeValueAsString(tree));
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+    public static final Builtin.Builtin1 marshal =
+            new Builtin.Builtin1(
+                    "yaml.marshal",
+                    (OpaWasm instance, int strAddr) -> {
+                        var str = dumpJson(instance, strAddr);
+                        try {
+                            return loadJson(instance, yamlMapper.writeValueAsString(str));
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
 
     public static Builtin.IBuiltin[] all() {
-        return new Builtin.IBuiltin[] {
-            isValid,
-                marshal,
-                unmarshal
-        };
+        return new Builtin.IBuiltin[] {isValid, marshal, unmarshal};
     }
 }

@@ -24,7 +24,7 @@ public class OpaWasm {
         HostFunction opaAbort =
                 new HostFunction(
                         (Instance instance, Value... args) -> {
-                            imports.opaAbort(instance, args[0].asInt());
+                            imports.opaAbort(this, args[0].asInt());
                             return new Value[] {};
                         },
                         "env",
@@ -34,7 +34,7 @@ public class OpaWasm {
         HostFunction opaPrintln =
                 new HostFunction(
                         (Instance instance, Value... args) -> {
-                            imports.opaPrintln(instance, args[0].asInt());
+                            imports.opaPrintln(this, args[0].asInt());
                             return new Value[] {};
                         },
                         "env",
@@ -43,64 +43,60 @@ public class OpaWasm {
                         List.of());
         HostFunction opaBuiltin0 =
                 new HostFunction(
-                        (Instance instance, Value... args) -> {
-                            return new Value[] {
-                                Value.i32(
-                                        imports.opaBuiltin0(
-                                                instance, args[0].asInt(), args[1].asInt()))
-                            };
-                        },
+                        (Instance instance, Value... args) ->
+                                new Value[] {
+                                    Value.i32(
+                                            imports.opaBuiltin0(
+                                                    this, args[0].asInt(), args[1].asInt()))
+                                },
                         "env",
                         "opa_builtin0",
                         List.of(ValueType.I32, ValueType.I32),
                         List.of(ValueType.I32));
         HostFunction opaBuiltin1 =
                 new HostFunction(
-                        (Instance instance, Value... args) -> {
-                            return new Value[] {
-                                Value.i32(
-                                        imports.opaBuiltin1(
-                                                instance,
-                                                args[0].asInt(),
-                                                args[1].asInt(),
-                                                args[2].asInt()))
-                            };
-                        },
+                        (Instance instance, Value... args) ->
+                                new Value[] {
+                                    Value.i32(
+                                            imports.opaBuiltin1(
+                                                    this,
+                                                    args[0].asInt(),
+                                                    args[1].asInt(),
+                                                    args[2].asInt()))
+                                },
                         "env",
                         "opa_builtin1",
                         List.of(ValueType.I32, ValueType.I32, ValueType.I32),
                         List.of(ValueType.I32));
         HostFunction opaBuiltin2 =
                 new HostFunction(
-                        (Instance instance, Value... args) -> {
-                            return new Value[] {
-                                Value.i32(
-                                        imports.opaBuiltin2(
-                                                instance,
-                                                args[0].asInt(),
-                                                args[1].asInt(),
-                                                args[2].asInt(),
-                                                args[3].asInt()))
-                            };
-                        },
+                        (Instance instance, Value... args) ->
+                                new Value[] {
+                                    Value.i32(
+                                            imports.opaBuiltin2(
+                                                    this,
+                                                    args[0].asInt(),
+                                                    args[1].asInt(),
+                                                    args[2].asInt(),
+                                                    args[3].asInt()))
+                                },
                         "env",
                         "opa_builtin2",
                         List.of(ValueType.I32, ValueType.I32, ValueType.I32, ValueType.I32),
                         List.of(ValueType.I32));
         HostFunction opaBuiltin3 =
                 new HostFunction(
-                        (Instance instance, Value... args) -> {
-                            return new Value[] {
-                                Value.i32(
-                                        imports.opaBuiltin3(
-                                                instance,
-                                                args[0].asInt(),
-                                                args[1].asInt(),
-                                                args[2].asInt(),
-                                                args[3].asInt(),
-                                                args[4].asInt()))
-                            };
-                        },
+                        (Instance instance, Value... args) ->
+                                new Value[] {
+                                    Value.i32(
+                                            imports.opaBuiltin3(
+                                                    this,
+                                                    args[0].asInt(),
+                                                    args[1].asInt(),
+                                                    args[2].asInt(),
+                                                    args[3].asInt(),
+                                                    args[4].asInt()))
+                                },
                         "env",
                         "opa_builtin3",
                         List.of(
@@ -112,19 +108,18 @@ public class OpaWasm {
                         List.of(ValueType.I32));
         HostFunction opaBuiltin4 =
                 new HostFunction(
-                        (Instance instance, Value... args) -> {
-                            return new Value[] {
-                                Value.i32(
-                                        imports.opaBuiltin4(
-                                                instance,
-                                                args[0].asInt(),
-                                                args[1].asInt(),
-                                                args[2].asInt(),
-                                                args[3].asInt(),
-                                                args[4].asInt(),
-                                                args[5].asInt()))
-                            };
-                        },
+                        (Instance instance, Value... args) ->
+                                new Value[] {
+                                    Value.i32(
+                                            imports.opaBuiltin4(
+                                                    this,
+                                                    args[0].asInt(),
+                                                    args[1].asInt(),
+                                                    args[2].asInt(),
+                                                    args[3].asInt(),
+                                                    args[4].asInt(),
+                                                    args[5].asInt()))
+                                },
                         "env",
                         "opa_builtin4",
                         List.of(

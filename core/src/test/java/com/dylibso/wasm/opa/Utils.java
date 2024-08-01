@@ -14,6 +14,7 @@ public class Utils {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+        System.out.println("DEBUG: " + json);
         return json.elements().next().findValue("result");
     }
 

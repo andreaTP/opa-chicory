@@ -66,12 +66,10 @@ public class OpaStringifiedSupportTest {
         var policy = Opa.loadPolicy(wasmFile);
         policy.entrypoint("stringified/support/plainInputBoolean");
 
-        var positiveResult =
-                getResult(policy.evaluate(jsonPrettyPrint("true")));
+        var positiveResult = getResult(policy.evaluate(jsonPrettyPrint("true")));
         assertTrue(positiveResult.asBoolean());
 
-        var negativeResult =
-                getResult(policy.evaluate(jsonPrettyPrint("false")));
+        var negativeResult = getResult(policy.evaluate(jsonPrettyPrint("false")));
         assertFalse(negativeResult.asBoolean());
     }
 
@@ -80,12 +78,10 @@ public class OpaStringifiedSupportTest {
         var policy = Opa.loadPolicy(wasmFile);
         policy.entrypoint("stringified/support/plainInputNumber");
 
-        var positiveResult =
-                getResult(policy.evaluate(jsonPrettyPrint("5")));
+        var positiveResult = getResult(policy.evaluate(jsonPrettyPrint("5")));
         assertTrue(positiveResult.asBoolean());
 
-        var negativeResult =
-                getResult(policy.evaluate(jsonPrettyPrint("6")));
+        var negativeResult = getResult(policy.evaluate(jsonPrettyPrint("6")));
         assertFalse(negativeResult.asBoolean());
     }
 
@@ -94,12 +90,10 @@ public class OpaStringifiedSupportTest {
         var policy = Opa.loadPolicy(wasmFile);
         policy.entrypoint("stringified/support/plainInputString");
 
-        var positiveResult =
-                getResult(policy.evaluate(jsonPrettyPrint("\"test\"")));
+        var positiveResult = getResult(policy.evaluate(jsonPrettyPrint("\"test\"")));
         assertTrue(positiveResult.asBoolean());
 
-        var negativeResult =
-                getResult(policy.evaluate(jsonPrettyPrint("\"invalid\"")));
+        var negativeResult = getResult(policy.evaluate(jsonPrettyPrint("\"invalid\"")));
         assertFalse(negativeResult.asBoolean());
     }
 }
