@@ -1,17 +1,13 @@
+package com.dylibso.wasm.opa;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.dylibso.wasm.opa.Opa;
-import com.dylibso.wasm.opa.OpaDefaultImports;
-import com.dylibso.wasm.opa.OpaErrorCode;
-import com.dylibso.wasm.opa.OpaWasm;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileInputStream;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 public class OpaTest {
@@ -50,7 +46,6 @@ public class OpaTest {
         opa.opaFree(dataStrAddr);
         opa.opaEvalCtxSetData(ctxAddr, dataAddr);
 
-        // TODO: add entrypoint handling
         var evalResult = opa.eval(ctxAddr);
         assertEquals(OpaErrorCode.OPA_ERR_OK, evalResult);
 
@@ -67,36 +62,31 @@ public class OpaTest {
     }
 
     private boolean readSingleBool(String input) throws JsonProcessingException {
-        return objectMapper
-                .readTree(input)
-                .elements()
-                .next()
-                .findValue("result")
-                .asBoolean();
+        return objectMapper.readTree(input).elements().next().findValue("result").asBoolean();
     }
 
     @Test
     public void highLevelAPI() throws Exception {
         try (var policy = Opa.loadPolicy(new File("src/test/resources/opa/policy.wasm"))) {
-            policy.setData("{ \"role\" : { \"alice\" : \"admin\", \"bob\" : \"user\" } }");
+            policy.data("{ \"role\" : { \"alice\" : \"admin\", \"bob\" : \"user\" } }");
 
             // evaluate the admin
-            policy.setInput("{\"user\": \"alice\"}");
+            policy.input("{\"user\": \"alice\"}");
             assertTrue(readSingleBool(policy.evaluate()));
 
             // evaluate a user
-            policy.setInput("{\"user\": \"bob\"}");
+            policy.input("{\"user\": \"bob\"}");
             assertFalse(readSingleBool(policy.evaluate()));
 
             // change the data of the policy
-            policy.setData("{ \"role\" : { \"bob\" : \"admin\", \"alice\" : \"user\" } }");
+            policy.data("{ \"role\" : { \"bob\" : \"admin\", \"alice\" : \"user\" } }");
 
             // evaluate the admin
-            policy.setInput("{\"user\": \"bob\"}");
+            policy.input("{\"user\": \"bob\"}");
             assertTrue(readSingleBool(policy.evaluate()));
 
             // evaluate a user
-            policy.setInput("{\"user\": \"alice\"}");
+            policy.input("{\"user\": \"alice\"}");
             assertFalse(readSingleBool(policy.evaluate()));
 
             // throws:

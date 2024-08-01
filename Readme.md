@@ -14,4 +14,4 @@ There are only a couple of steps required to start evaluating the policy.
 
 ## Requirements:
 
-To run the tests you need the `opa` cli available on the classpath.
+To run the tests you need the `opa` cli available on the `PATH` and `tar`.

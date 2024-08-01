@@ -6,9 +6,17 @@ import com.dylibso.chicory.wasm.types.MemoryLimits;
 
 // to be implemented by the user
 public class OpaDefaultImports implements OpaImports {
-
+    // TODO: review the default min, max limits
     // hold a reference to the runtime memory
-    private final Memory memory = new Memory(new MemoryLimits(10, 100));
+    protected final Memory memory;
+
+    public OpaDefaultImports() {
+        this(10, MemoryLimits.MAX_PAGES);
+    }
+
+    public OpaDefaultImports(int initial, int maximum) {
+        memory = new Memory(new MemoryLimits(initial, maximum));
+    }
 
     public Memory memory() {
         return memory;

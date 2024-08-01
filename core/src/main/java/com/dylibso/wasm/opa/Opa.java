@@ -1,5 +1,9 @@
 package com.dylibso.wasm.opa;
 
+import com.dylibso.chicory.runtime.Memory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +19,7 @@ public class Opa {
 
     public static class OpaPolicy implements AutoCloseable {
         private final OpaWasm wasm;
+        private final ObjectMapper mapper;
         private int baseHeapPtr = -1;
         private int dataHeapPtr = -1;
         private int dataAddr = -1;
@@ -23,6 +28,7 @@ public class Opa {
         private int entrypoint;
 
         private OpaPolicy(OpaWasm wasm) {
+            mapper = new ObjectMapper();
             this.wasm = wasm;
 
             if (!(wasm.opaWasmAbiVersion() == 1 && wasm.opaWasmAbiMinorVersion() == 3)) {
@@ -39,8 +45,13 @@ public class Opa {
             wasm.opaHeapPtrSet(this.dataHeapPtr);
         }
 
-        public OpaPolicy setEntrypoint(int entrypoint) {
+        public OpaPolicy entrypoint(int entrypoint) {
             this.entrypoint = entrypoint;
+            return this;
+        }
+
+        public OpaPolicy entrypoint(String entrypoint) {
+            this.entrypoint = findEntrypoint(entrypoint);
             return this;
         }
 
@@ -61,23 +72,54 @@ public class Opa {
 
         // data MUST be a serializable object or ArrayBuffer, which assumed to be a well-formed
         // stringified JSON
-        public OpaPolicy setData(String data) {
+        public OpaPolicy data(String data) {
             wasm.opaHeapPtrSet(this.baseHeapPtr);
             this.dataAddr = loadJson(data);
             this.dataHeapPtr = wasm.opaHeapPtrGet();
             return this;
         }
 
-        public OpaPolicy setInput(String input) {
+        public OpaPolicy input(String input) {
+            var inputLen = input.getBytes().length;
+            var delta = this.dataHeapPtr + inputLen - (wasm.memory().pages() * Memory.PAGE_SIZE);
+            if (delta > 0) {
+                // TODO: similar logic might go into Chicory itself?
+                var pageSize = (int) Math.ceil(delta / Memory.PAGE_SIZE);
+                var grown = wasm.memory().grow(pageSize);
+                if (grown == -1) {
+                    throw new RuntimeException("Maximum memory size exceeded");
+                }
+            }
+
             this.inputAddr = loadJson(input);
             return this;
+        }
+
+        public int findEntrypoint(String name) {
+            var x = dumpJson(wasm.entrypoints());
+            try {
+                var json = dumpJson(wasm.entrypoints());
+                var entrypoints = mapper.readTree(json);
+                if (!entrypoints.has(name)) {
+                    throw new IllegalArgumentException("entrypoint " + name + " is not valid in this instance");
+                }
+                return entrypoints.findValue(name).asInt();
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to parse the response from \"entrypoints()\"", e);
+            }
         }
 
         public String evaluate() {
             try {
                 var ctxAddr = wasm.opaEvalCtxNew();
-                wasm.opaEvalCtxSetInput(ctxAddr, this.inputAddr);
+                if (this.dataAddr == -1) {
+                    data("{}");
+                }
                 wasm.opaEvalCtxSetData(ctxAddr, this.dataAddr);
+                if (this.inputAddr == -1) {
+                    input("{}");
+                }
+                wasm.opaEvalCtxSetInput(ctxAddr, this.inputAddr);
                 wasm.opaEvalCtxSetEntrypoint(ctxAddr, this.entrypoint);
 
                 var evalResult = wasm.eval(ctxAddr);
@@ -95,7 +137,7 @@ public class Opa {
         }
 
         public String evaluate(String input) {
-            setInput(input);
+            input(input);
             return evaluate();
         }
 
@@ -114,7 +156,7 @@ public class Opa {
     }
 
     public static OpaPolicy loadPolicy(InputStream input) {
-        return new OpaPolicy(new OpaWasm(new OpaDefaultImports(), input));
+        return loadPolicy(input, new OpaDefaultImports());
     }
 
     public static OpaPolicy loadPolicy(ByteBuffer buffer) {
@@ -132,6 +174,30 @@ public class Opa {
     public static OpaPolicy loadPolicy(File file) {
         try {
             return loadPolicy(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("File not found at path: " + file.getPath(), e);
+        }
+    }
+
+    public static OpaPolicy loadPolicy(InputStream input, OpaImports imports) {
+        return new OpaPolicy(new OpaWasm(imports, input));
+    }
+
+    public static OpaPolicy loadPolicy(ByteBuffer buffer, OpaImports imports) {
+        return loadPolicy(buffer.array(), imports);
+    }
+
+    public static OpaPolicy loadPolicy(byte[] buffer, OpaImports imports) {
+        return loadPolicy(new ByteArrayInputStream(buffer), imports);
+    }
+
+    public static OpaPolicy loadPolicy(Path path, OpaImports imports) {
+        return loadPolicy(path.toFile(), imports);
+    }
+
+    public static OpaPolicy loadPolicy(File file, OpaImports imports) {
+        try {
+            return loadPolicy(new FileInputStream(file), imports);
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("File not found at path: " + file.getPath(), e);
         }
