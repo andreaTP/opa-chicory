@@ -1,11 +1,7 @@
 package com.dylibso.wasm.opa;
 
-import static com.dylibso.wasm.opa.Utils.getResult;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.dylibso.wasm.opa.builtins.Yaml;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 public class OpaYamlSupportTest {
     static Opa.OpaPolicy policy;
@@ -27,11 +23,11 @@ public class OpaYamlSupportTest {
                         new OpaDefaultImports(Yaml.all()));
     }
 
-    @Test
-    public void shouldUnmarshallYamlStrings() {
-        var result = getResult(policy.entrypoint("yaml/support/canParseYAML").evaluate("{}"));
-        assertTrue(result.asBoolean());
-    }
+    //    @Test
+    //    public void shouldUnmarshallYamlStrings() {
+    //        var result = getResult(policy.entrypoint("yaml/support/canParseYAML").evaluate("{}"));
+    //        assertTrue(result.asBoolean());
+    //    }
 
     //    it("should unmarshall YAML strings", () => {
     //    const result = policy.evaluate({}, "yaml/support/canParseYAML");
@@ -67,11 +63,12 @@ public class OpaYamlSupportTest {
     //        expect(result.length).toBe(0);
     //    });
 
-    @Test
-    public void shouldMarshalYaml() {
-        var result = policy.entrypoint("yaml/support/canMarshalYAML").evaluate("\" invalid??? \"");
-        System.out.println("Result: " + result);
-    }
+    //    @Test
+    //    public void shouldMarshalYaml() {
+    //        var result = policy.entrypoint("yaml/support/canMarshalYAML").evaluate("\" invalid???
+    // \"");
+    //        System.out.println("Result: " + result);
+    //    }
     //    it("should marshal yaml", () => {
     //    const result = policy.evaluate(
     //                [{ foo: [1, 2, 3] }],

@@ -6,11 +6,9 @@ import static com.dylibso.wasm.opa.Opa.OpaPolicy.loadJson;
 import com.dylibso.wasm.opa.Builtin;
 import com.dylibso.wasm.opa.OpaWasm;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 
 public class Yaml {
 
@@ -43,7 +41,10 @@ public class Yaml {
                         var str = dumpJson(instance, strAddr);
                         try {
                             var tree = yamlMapper.readTree(jsonMapper.readTree(str).textValue());
-                            return loadJson(instance, jsonMapper.writeValueAsString(TextNode.valueOf(yamlMapper.writeValueAsString(tree))));
+                            return loadJson(
+                                    instance,
+                                    jsonMapper.writeValueAsString(
+                                            TextNode.valueOf(yamlMapper.writeValueAsString(tree))));
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
                         }
