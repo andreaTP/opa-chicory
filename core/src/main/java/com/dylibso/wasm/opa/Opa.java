@@ -3,7 +3,6 @@ package com.dylibso.wasm.opa;
 import com.dylibso.chicory.runtime.Memory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +16,7 @@ import java.nio.file.Path;
 // https://github.com/open-policy-agent/npm-opa-wasm/blob/main/README.md
 public class Opa {
 
-    public static class OpaPolicy implements AutoCloseable {
+    public static class OpaPolicy {
         private final OpaWasm wasm;
         private final ObjectMapper mapper;
         private int baseHeapPtr = -1;
@@ -99,41 +98,41 @@ public class Opa {
             var x = dumpJson(wasm.entrypoints());
             try {
                 var json = dumpJson(wasm.entrypoints());
+                // So far, this is the only place we actually use Jackson, let's review if it's
+                // really needed at the end
                 var entrypoints = mapper.readTree(json);
                 if (!entrypoints.has(name)) {
-                    throw new IllegalArgumentException("entrypoint " + name + " is not valid in this instance");
+                    throw new IllegalArgumentException(
+                            "entrypoint " + name + " is not valid in this instance");
                 }
                 return entrypoints.findValue(name).asInt();
             } catch (JsonProcessingException e) {
-                throw new RuntimeException("Failed to parse the response from \"entrypoints()\"", e);
+                throw new RuntimeException(
+                        "Failed to parse the response from \"entrypoints()\"", e);
             }
         }
 
         public String evaluate() {
-            try {
-                var ctxAddr = wasm.opaEvalCtxNew();
-                if (this.dataAddr == -1) {
-                    data("{}");
-                }
-                wasm.opaEvalCtxSetData(ctxAddr, this.dataAddr);
-                if (this.inputAddr == -1) {
-                    input("{}");
-                }
-                wasm.opaEvalCtxSetInput(ctxAddr, this.inputAddr);
-                wasm.opaEvalCtxSetEntrypoint(ctxAddr, this.entrypoint);
-
-                var evalResult = wasm.eval(ctxAddr);
-                if (evalResult != OpaErrorCode.OPA_ERR_OK) {
-                    throw new RuntimeException(
-                            "Error evaluating the Opa Policy, returned code is: " + evalResult);
-                }
-
-                this.resultAddr = wasm.opaEvalCtxGetResult(ctxAddr);
-                var result = dumpJson(resultAddr);
-                return result;
-            } finally {
-                close();
+            var ctxAddr = wasm.opaEvalCtxNew();
+            if (this.dataAddr == -1) {
+                data("{}");
             }
+            wasm.opaEvalCtxSetData(ctxAddr, this.dataAddr);
+            if (this.inputAddr == -1) {
+                input("{}");
+            }
+            wasm.opaEvalCtxSetInput(ctxAddr, this.inputAddr);
+            wasm.opaEvalCtxSetEntrypoint(ctxAddr, this.entrypoint);
+
+            var evalResult = wasm.eval(ctxAddr);
+            if (evalResult != OpaErrorCode.OPA_ERR_OK) {
+                throw new RuntimeException(
+                        "Error evaluating the Opa Policy, returned code is: " + evalResult);
+            }
+
+            this.resultAddr = wasm.opaEvalCtxGetResult(ctxAddr);
+            var result = dumpJson(resultAddr);
+            return result;
         }
 
         public String evaluate(String input) {
@@ -145,13 +144,6 @@ public class Opa {
             if (addr != -1) {
                 wasm.opaValueFree(addr);
             }
-        }
-
-        @Override
-        public void close() {
-            free(inputAddr);
-            free(dataAddr);
-            free(resultAddr);
         }
     }
 

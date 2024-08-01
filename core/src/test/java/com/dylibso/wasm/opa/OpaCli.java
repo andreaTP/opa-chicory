@@ -6,10 +6,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.io.FileUtils;
 
 public class OpaCli {
 
-    private static Path baseSourceFolder = Path.of("src", "test", "resources", "fixtures");
+    public static Path baseSourceFolder = Path.of("src", "test", "resources", "fixtures");
     private static Path baseDestFolder = Path.of("target", "compiled-policies");
 
     private static String bundleName = "bundle.tar.gz";
@@ -27,6 +28,9 @@ public class OpaCli {
                         .getName()
                         .replace(".rego", "");
         var targetFolder = baseDestFolder.resolve(plainName);
+        if (targetFolder.toFile().exists()) {
+            FileUtils.deleteDirectory(targetFolder.toFile());
+        }
         targetFolder.toFile().mkdirs();
         var targetBundle = baseDestFolder.resolve(plainName).resolve(bundleName);
 

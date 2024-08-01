@@ -67,34 +67,33 @@ public class OpaTest {
 
     @Test
     public void highLevelAPI() throws Exception {
-        try (var policy = Opa.loadPolicy(new File("src/test/resources/opa/policy.wasm"))) {
-            policy.data("{ \"role\" : { \"alice\" : \"admin\", \"bob\" : \"user\" } }");
+        var policy = Opa.loadPolicy(new File("src/test/resources/opa/policy.wasm"));
+        policy.data("{ \"role\" : { \"alice\" : \"admin\", \"bob\" : \"user\" } }");
 
-            // evaluate the admin
-            policy.input("{\"user\": \"alice\"}");
-            assertTrue(readSingleBool(policy.evaluate()));
+        // evaluate the admin
+        policy.input("{\"user\": \"alice\"}");
+        assertTrue(readSingleBool(policy.evaluate()));
 
-            // evaluate a user
-            policy.input("{\"user\": \"bob\"}");
-            assertFalse(readSingleBool(policy.evaluate()));
+        // evaluate a user
+        policy.input("{\"user\": \"bob\"}");
+        assertFalse(readSingleBool(policy.evaluate()));
 
-            // change the data of the policy
-            policy.data("{ \"role\" : { \"bob\" : \"admin\", \"alice\" : \"user\" } }");
+        // change the data of the policy
+        policy.data("{ \"role\" : { \"bob\" : \"admin\", \"alice\" : \"user\" } }");
 
-            // evaluate the admin
-            policy.input("{\"user\": \"bob\"}");
-            assertTrue(readSingleBool(policy.evaluate()));
+        // evaluate the admin
+        policy.input("{\"user\": \"bob\"}");
+        assertTrue(readSingleBool(policy.evaluate()));
 
-            // evaluate a user
-            policy.input("{\"user\": \"alice\"}");
-            assertFalse(readSingleBool(policy.evaluate()));
+        // evaluate a user
+        policy.input("{\"user\": \"alice\"}");
+        assertFalse(readSingleBool(policy.evaluate()));
 
-            // throws:
-            // com.dylibso.chicory.runtime.exceptions.WASMRuntimeException: integer divide by zero
-            // is it expected?
-            // evaluate an in-existent user
-            //            opa.setInput("{\"user\": \"charles\"}");
-            //            assertFalse(readSingleBool(opa.evaluate()));
-        }
+        // throws:
+        // com.dylibso.chicory.runtime.exceptions.WASMRuntimeException: integer divide by zero
+        // is it expected?
+        // evaluate an in-existent user
+        //            opa.setInput("{\"user\": \"charles\"}");
+        //            assertFalse(readSingleBool(opa.evaluate()));
     }
 }
