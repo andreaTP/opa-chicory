@@ -13,38 +13,39 @@ public class Yaml {
     public static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     // maybe: .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
 
-    private static int loadJson(OpaWasm wasm, String data) {
-        var dataStrAddr = wasm.opaMalloc(data.length());
-        wasm.memory().writeCString(dataStrAddr, data);
-        var dstAddr = wasm.opaJsonParse(dataStrAddr, data.length());
-        wasm.opaFree(dataStrAddr);
-        return dstAddr;
-    }
-
-    private static String dumpJson(OpaWasm wasm, int addr) {
-        int resultStrAddr = wasm.opaJsonDump(addr);
-        var result = wasm.memory().readCString(resultStrAddr);
-        wasm.opaFree(resultStrAddr);
-        return result;
-    }
+    //    private static int loadJson(OpaWasm wasm, String data) {
+    //        var dataStrAddr = wasm.opaMalloc(data.length());
+    //        wasm.memory().writeCString(dataStrAddr, data);
+    //        var dstAddr = wasm.opaJsonParse(dataStrAddr, data.length());
+    //        wasm.opaFree(dataStrAddr);
+    //        return dstAddr;
+    //    }
+    //
+    //    private static String dumpJson(OpaWasm wasm, int addr) {
+    //        int resultStrAddr = wasm.opaJsonDump(addr);
+    //        var result = wasm.memory().readCString(resultStrAddr);
+    //        wasm.opaFree(resultStrAddr);
+    //        return result;
+    //    }
 
     public static final Builtin.Builtin1 isValid =
             new Builtin.Builtin1(
                     "yaml.is_valid",
                     (OpaWasm instance, int strAddr) -> {
                         System.out.println("Yaml is valid");
-                        var str = dumpJson(instance, strAddr);
-                        try {
-                            yamlMapper.readTree(str);
-                            // true - is valid
-                            return loadJson(instance, jsonMapper.writeValueAsString(true));
-                        } catch (JsonProcessingException e) {
-                            try {
-                                return loadJson(instance, jsonMapper.writeValueAsString(false));
-                            } catch (JsonProcessingException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                        }
+//                        var str = dumpJson(instance, strAddr);
+//                        try {
+//                            yamlMapper.readTree(str);
+//                            // true - is valid
+//                            return loadJson(instance, jsonMapper.writeValueAsString(true));
+//                        } catch (JsonProcessingException e) {
+//                            try {
+//                                return loadJson(instance, jsonMapper.writeValueAsString(false));
+//                            } catch (JsonProcessingException ex) {
+//                                throw new RuntimeException(ex);
+//                            }
+//                        }
+                        return 1;
                     });
 
     public static final Builtin.Builtin1 unmarshal =
@@ -52,13 +53,15 @@ public class Yaml {
                     "yaml.unmarshal",
                     (OpaWasm instance, int strAddr) -> {
                         System.out.println("Yaml unmarshal");
-                        var str = dumpJson(instance, strAddr);
+                        var yamlStr = instance.memory().readCString(strAddr);
                         try {
-                            var tree = yamlMapper.readTree(jsonMapper.readTree(str).textValue());
-                            return loadJson(
-                                    instance,
-                                    jsonMapper.writeValueAsString(
-                                            TextNode.valueOf(yamlMapper.writeValueAsString(tree))));
+                            var tree = yamlMapper.readTree(yamlStr);
+                            var jsonStr = jsonMapper.writeValueAsString(tree);
+                            var jsonAddr = instance.opaMalloc(jsonStr.length());
+                            instance.memory().writeCString(jsonAddr, jsonStr);
+                            var resultAddr = instance.opaJsonParse(jsonAddr, jsonStr.length());
+                            instance.opaFree(jsonAddr);
+                            return resultAddr;
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
                         }
