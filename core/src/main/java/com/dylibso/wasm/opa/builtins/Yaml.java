@@ -4,7 +4,6 @@ import com.dylibso.wasm.opa.Builtin;
 import com.dylibso.wasm.opa.OpaWasm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class Yaml {
@@ -13,46 +12,46 @@ public class Yaml {
     public static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     // maybe: .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
 
-    //    private static int loadJson(OpaWasm wasm, String data) {
-    //        var dataStrAddr = wasm.opaMalloc(data.length());
-    //        wasm.memory().writeCString(dataStrAddr, data);
-    //        var dstAddr = wasm.opaJsonParse(dataStrAddr, data.length());
-    //        wasm.opaFree(dataStrAddr);
-    //        return dstAddr;
-    //    }
-    //
-    //    private static String dumpJson(OpaWasm wasm, int addr) {
-    //        int resultStrAddr = wasm.opaJsonDump(addr);
-    //        var result = wasm.memory().readCString(resultStrAddr);
-    //        wasm.opaFree(resultStrAddr);
-    //        return result;
-    //    }
-
     public static final Builtin.Builtin1 isValid =
             new Builtin.Builtin1(
                     "yaml.is_valid",
                     (OpaWasm instance, int strAddr) -> {
-                        System.out.println("Yaml is valid");
-//                        var str = dumpJson(instance, strAddr);
-//                        try {
-//                            yamlMapper.readTree(str);
-//                            // true - is valid
-//                            return loadJson(instance, jsonMapper.writeValueAsString(true));
-//                        } catch (JsonProcessingException e) {
-//                            try {
-//                                return loadJson(instance, jsonMapper.writeValueAsString(false));
-//                            } catch (JsonProcessingException ex) {
-//                                throw new RuntimeException(ex);
-//                            }
-//                        }
-                        return 1;
+                        int resultYamlAddr = instance.opaJsonDump(strAddr);
+                        var boxedYamlStr = instance.memory().readCString(resultYamlAddr);
+                        instance.opaFree(resultYamlAddr);
+                        boolean result = false;
+                        try {
+                            var boxedYaml = jsonMapper.readTree(boxedYamlStr);
+                            if (!boxedYaml.isTextual()) {
+                                result = false;
+                            } else {
+                                try {
+                                    yamlMapper.readTree(boxedYaml.asText());
+                                    result = true;
+                                } catch (JsonProcessingException e) {
+                                    result = false;
+                                }
+                            }
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                        var jsonStr = "";
+                        try {
+                            jsonStr = jsonMapper.writeValueAsString(result);
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                        var jsonAddr = instance.opaMalloc(jsonStr.length());
+                        instance.memory().writeCString(jsonAddr, jsonStr);
+                        var resultAddr = instance.opaJsonParse(jsonAddr, jsonStr.length());
+                        instance.opaFree(jsonAddr);
+                        return resultAddr;
                     });
 
     public static final Builtin.Builtin1 unmarshal =
             new Builtin.Builtin1(
                     "yaml.unmarshal",
                     (OpaWasm instance, int strAddr) -> {
-                        System.out.println("Yaml unmarshal");
                         var yamlStr = instance.memory().readCString(strAddr);
                         try {
                             var tree = yamlMapper.readTree(yamlStr);

@@ -69,7 +69,7 @@ public class OpaDefaultImports implements OpaImports {
 
     @Override
     public int opaBuiltin1(OpaWasm instance, int builtinId, int ctx, int _1) {
-        if (builtinId > 0 && builtinId < builtins.length && builtins[builtinId] != null) {
+        if (builtinId >= 0 && builtinId < builtins.length && builtins[builtinId] != null) {
             return builtins[builtinId].asBuiltin1(instance, _1);
         }
         throw new RuntimeException("opa_builtin1 - " + builtinId + " - not implemented");

@@ -1,12 +1,17 @@
 package com.dylibso.wasm.opa;
 
+import static com.dylibso.wasm.opa.Utils.getResult;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.dylibso.wasm.opa.builtins.Yaml;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static com.dylibso.wasm.opa.Utils.getResult;
-
 public class OpaYamlSupportTest {
+    static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     static Opa.OpaPolicy policy;
 
     @BeforeAll
@@ -26,11 +31,12 @@ public class OpaYamlSupportTest {
                         new OpaDefaultImports(Yaml.all()));
     }
 
-    //    @Test
-    //    public void shouldUnmarshallYamlStrings() {
-    //        var result = getResult(policy.entrypoint("yaml/support/canParseYAML").evaluate("{}"));
-    //        assertTrue(result.asBoolean());
-    //    }
+    //        @Test
+    //        public void shouldUnmarshallYamlStrings() {
+    //            var result =
+    // getResult(policy.entrypoint("yaml/support/canParseYAML").evaluate("{}"));
+    //            assertTrue(result.asBoolean());
+    //        }
 
     //    it("should unmarshall YAML strings", () => {
     //    const result = policy.evaluate({}, "yaml/support/canParseYAML");
@@ -66,19 +72,24 @@ public class OpaYamlSupportTest {
     //        expect(result.length).toBe(0);
     //    });
 
-        @Test
-        public void shouldMarshalYaml() {
-            var result = getResult(policy.entrypoint("yaml/support/canMarshalYAML").evaluate("[{ \"foo\": [1, 2, 3] }]"));
-            System.out.println("Result: " + result);
-        }
-    //    it("should marshal yaml", () => {
-    //    const result = policy.evaluate(
-    //                [{ foo: [1, 2, 3] }],
-    //        "yaml/support/canMarshalYAML",
-    //    );
-    //        expect(result.length).toBe(1);
-    //        expect(result[0]).toMatchObject({ result: [[{ foo: [1, 2, 3] }]] });
-    //    });
+    @Test
+    public void shouldMarshalYaml() throws Exception {
+        var result =
+                getResult(
+                        policy.entrypoint("yaml/support/canMarshalYAML")
+                                .evaluate("[{ \"foo\": [1, 2, 3] }]"));
+        var array = result.elements().next();
+        var foo = array.findValue("foo").elements();
+        assertEquals(1, foo.next().asInt());
+        assertEquals(2, foo.next().asInt());
+        assertEquals(3, foo.next().asInt());
+    }
+
+    @Test
+    public void shouldValidateYaml() throws Exception {
+        var result = getResult(policy.entrypoint("yaml/support/isValidYAML").evaluate("{}"));
+        assertTrue(result.asBoolean());
+    }
     //
     //    it("should validate yaml", () => {
     //    const result = policy.evaluate({}, "yaml/support/isValidYAML");
