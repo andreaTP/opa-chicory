@@ -14,8 +14,11 @@ public class Utils {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
-        return json.elements().next().findValue("result");
+        try {
+            return json.elements().next().findValue("result");
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected result: " + jsonStr);
+        }
     }
 
     public static String rootCauseMessage(Throwable e) {

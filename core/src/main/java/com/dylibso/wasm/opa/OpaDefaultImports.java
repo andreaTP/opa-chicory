@@ -7,7 +7,6 @@ import java.util.Map;
 // to be implemented by the user
 public class OpaDefaultImports implements OpaImports {
     // TODO: review the default min, max limits
-    // hold a reference to the runtime memory
     protected final Memory memory;
     protected OpaBuiltin.Builtin[] builtins = new OpaBuiltin.Builtin[0];
 

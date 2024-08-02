@@ -7,13 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.dylibso.wasm.opa.builtins.Yaml;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class OpaYamlSupportTest {
-    static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     static Opa.OpaPolicy policy;
 
     @BeforeAll

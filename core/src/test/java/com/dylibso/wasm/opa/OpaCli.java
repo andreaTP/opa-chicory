@@ -18,6 +18,11 @@ public class OpaCli {
     private OpaCli() {}
 
     public static Path compile(String regoFolder, String... entrypoints) throws IOException {
+        return compile(regoFolder, false, entrypoints);
+    }
+
+    public static Path compile(String regoFolder, boolean capabilities, String... entrypoints)
+            throws IOException {
         var sourceFolder = baseSourceFolder.resolve(regoFolder);
         var plainName =
                 Files.list(sourceFolder)
@@ -27,12 +32,12 @@ public class OpaCli {
                         .toFile()
                         .getName()
                         .replace(".rego", "");
-        var targetFolder = baseDestFolder.resolve(plainName);
+        var targetFolder = baseDestFolder.resolve(regoFolder);
         if (targetFolder.toFile().exists()) {
             FileUtils.deleteDirectory(targetFolder.toFile());
         }
         targetFolder.toFile().mkdirs();
-        var targetBundle = baseDestFolder.resolve(plainName).resolve(bundleName);
+        var targetBundle = baseDestFolder.resolve(regoFolder).resolve(bundleName);
 
         List<String> command = new ArrayList<>();
         command.add("opa");
@@ -42,6 +47,11 @@ public class OpaCli {
         command.add(targetBundle.toFile().getAbsolutePath());
         command.add("-t");
         command.add("wasm");
+        if (capabilities) {
+            var capabilitiesFile = sourceFolder.resolve("capabilities.json");
+            command.add("--capabilities");
+            command.add(capabilitiesFile.toFile().getAbsolutePath());
+        }
         for (var entrypoint : entrypoints) {
             command.add("-e");
             command.add(entrypoint);
@@ -65,7 +75,7 @@ public class OpaCli {
         tarCommand.add("tar");
         tarCommand.add("-xf");
         tarCommand.add(bundleName);
-        // System.out.println("Going to execute command: " + String.join(" ", command));
+        // System.out.println("Going to execute command: " + String.join(" ", tarCommand));
 
         ProcessBuilder tarPb = new ProcessBuilder(tarCommand);
         tarPb.directory(targetFolder.toFile());

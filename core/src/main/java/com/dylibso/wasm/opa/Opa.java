@@ -2,6 +2,7 @@ package com.dylibso.wasm.opa;
 
 import com.dylibso.chicory.runtime.Memory;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -17,9 +18,11 @@ import java.util.HashMap;
 // https://github.com/open-policy-agent/npm-opa-wasm/blob/main/README.md
 public class Opa {
 
+    // TODO: pass around a concrete instance instead of using a global one
+    public static ObjectMapper jsonMapper = new ObjectMapper();
+
     public static class OpaPolicy {
         private final OpaWasm wasm;
-        private final ObjectMapper mapper;
         private int baseHeapPtr = -1;
         private int dataHeapPtr = -1;
         private int dataAddr = -1;
@@ -28,7 +31,6 @@ public class Opa {
         private int entrypoint;
 
         private OpaPolicy(OpaWasm wasm) {
-            mapper = new ObjectMapper();
             this.wasm = wasm;
 
             if (!(wasm.opaWasmAbiVersion() == 1 && wasm.opaWasmAbiMinorVersion() == 3)) {
@@ -52,7 +54,7 @@ public class Opa {
                 var builtinsStr = wasm.memory().readCString(builtinsStrAddr);
                 wasm.opaFree(builtinsStrAddr);
                 wasm.opaFree(builtinsAddr);
-                var fields = mapper.readTree(builtinsStr).fields();
+                var fields = jsonMapper.readTree(builtinsStr).fields();
                 while (fields.hasNext()) {
                     var field = fields.next();
                     mappings.put(field.getKey(), field.getValue().intValue());
@@ -116,7 +118,7 @@ public class Opa {
         public int findEntrypoint(String name) {
             try {
                 var json = dumpJson(wasm.entrypoints());
-                var entrypoints = mapper.readTree(json);
+                var entrypoints = jsonMapper.readTree(json);
                 if (!entrypoints.has(name)) {
                     throw new IllegalArgumentException(
                             "entrypoint " + name + " is not valid in this instance");
@@ -153,6 +155,15 @@ public class Opa {
 
         public String evaluate(String input) {
             input(input);
+            return evaluate();
+        }
+
+        public String evaluate(JsonNode input) {
+            try {
+                input(jsonMapper.writeValueAsString(input));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
             return evaluate();
         }
     }
