@@ -1,7 +1,6 @@
 package com.dylibso.wasm.opa;
 
 import static com.dylibso.wasm.opa.Utils.getResult;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -61,8 +60,7 @@ public class MultipleEntrypointsTest {
                 assertThrows(
                         IllegalArgumentException.class,
                         () -> policy.entrypoint("not/a/real/entrypoint"));
-        assertEquals(
-                "entrypoint not/a/real/entrypoint is not valid in this instance",
-                exception.getMessage());
+        assertTrue(exception.getMessage().contains("not/a/real/entrypoint"));
+        assertTrue(exception.getMessage().contains("is not defined"));
     }
 }

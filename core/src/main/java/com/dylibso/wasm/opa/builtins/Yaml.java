@@ -14,7 +14,6 @@ public class Yaml {
     // maybe: .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
 
     private static JsonNode isValidImpl(JsonNode boxedYaml) {
-        boolean result = false;
         if (!boxedYaml.isTextual()) {
             return BooleanNode.getFalse();
         } else {

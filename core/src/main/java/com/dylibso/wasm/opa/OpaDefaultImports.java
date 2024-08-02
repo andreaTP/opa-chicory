@@ -2,6 +2,7 @@ package com.dylibso.wasm.opa;
 
 import com.dylibso.chicory.runtime.Memory;
 import com.dylibso.chicory.wasm.types.MemoryLimits;
+import com.dylibso.wasm.opa.builtins.Provided;
 import java.util.Map;
 
 // to be implemented by the user
@@ -35,6 +36,13 @@ public class OpaDefaultImports implements OpaImports {
             result[m.getValue()] = () -> m.getKey();
         }
         for (var builtin : this.builtins) {
+            if (mappings.containsKey(builtin.name())) {
+                result[mappings.get(builtin.name())] = builtin;
+            }
+        }
+        // provided builtins override anything with clashing name
+        var all = Provided.all();
+        for (var builtin : all) {
             if (mappings.containsKey(builtin.name())) {
                 result[mappings.get(builtin.name())] = builtin;
             }

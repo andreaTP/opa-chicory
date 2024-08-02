@@ -121,7 +121,7 @@ public class Opa {
                 var entrypoints = jsonMapper.readTree(json);
                 if (!entrypoints.has(name)) {
                     throw new IllegalArgumentException(
-                            "entrypoint " + name + " is not valid in this instance");
+                            "Entrypoint " + name + " is not defined in this policy");
                 }
                 return entrypoints.findValue(name).asInt();
             } catch (JsonProcessingException e) {

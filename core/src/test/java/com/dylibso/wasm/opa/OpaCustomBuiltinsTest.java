@@ -2,28 +2,14 @@ package com.dylibso.wasm.opa;
 
 import static com.dylibso.wasm.opa.Utils.getResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class OpaCustomBuiltinsTest {
-    static ObjectMapper jsonMapper = new ObjectMapper();
     static Opa.OpaPolicy policy;
-
-    //          "custom.zeroArgBuiltin": () => `hello`,
-    //            "custom.oneArgBuiltin": (arg0) => `hello ${arg0}`,
-    //            "custom.twoArgBuiltin": (arg0, arg1) => `hello ${arg0}, ${arg1}`,
-    //            "custom.threeArgBuiltin": (arg0, arg1, arg2) => (
-    //            `hello ${arg0}, ${arg1}, ${arg2}`
-    //            ),
-    //            "custom.fourArgBuiltin": (arg0, arg1, arg2, arg3) => (
-    //            `hello ${arg0}, ${arg1}, ${arg2}, ${arg3}`
-    //            ),
-    //            "json.is_valid": () => {
-    //        throw new Error("should never happen");
-    //    },
 
     static OpaBuiltin.Builtin[] customBuiltins =
             new OpaBuiltin.Builtin[] {
@@ -56,7 +42,12 @@ public class OpaCustomBuiltinsTest {
                                                 + ", "
                                                 + arg2.asText()
                                                 + ", "
-                                                + arg3.asText()))
+                                                + arg3.asText())),
+                OpaBuiltin.from(
+                        "json.is_valid",
+                        (arg0) -> {
+                            throw new RuntimeException("should never happen");
+                        })
             };
 
     @BeforeAll
@@ -70,7 +61,8 @@ public class OpaCustomBuiltinsTest {
                                         "custom_builtins/one_arg",
                                         "custom_builtins/two_arg",
                                         "custom_builtins/three_arg",
-                                        "custom_builtins/four_arg")
+                                        "custom_builtins/four_arg",
+                                        "custom_builtins/valid_json")
                                 .resolve("policy.wasm"),
                         new OpaDefaultImports(customBuiltins));
     }
@@ -117,32 +109,10 @@ public class OpaCustomBuiltinsTest {
                                         "{ \"args\": [\"arg0\", \"arg1\", \"arg2\", \"arg3\"] }"));
         assertEquals("hello arg0, arg1, arg2, arg3", result.asText());
     }
-    //
-    //    it("should call a custom three-arg builtin", () => {
-    //    const result = policy.evaluate(
-    //                { args: ["arg0", "arg1", "arg2"] },
-    //        "custom_builtins/three_arg",
-    //    );
-    //        expect(result.length).not.toBe(0);
-    //        expect(result[0]).toMatchObject({
-    //                result: "hello arg0, arg1, arg2",
-    //    });
-    //    });
-    //
-    //    it("should call a custom four-arg builtin", () => {
-    //    const result = policy.evaluate(
-    //                { args: ["arg0", "arg1", "arg2", "arg3"] },
-    //        "custom_builtins/four_arg",
-    //    );
-    //        expect(result.length).not.toBe(0);
-    //        expect(result[0]).toMatchObject({
-    //                result: "hello arg0, arg1, arg2, arg3",
-    //    });
-    //    });
-    //
-    //    it("should call a provided builtin over a custom builtin", () => {
-    //    const result = policy.evaluate({}, "custom_builtins/valid_json");
-    //        expect(result.length).not.toBe(0);
-    //        expect(result[0]).toMatchObject({ result: true });
-    //    });
+
+    @Test
+    public void shouldCallAProvidedBuiltinOverACustomBuiltin() {
+        var result = getResult(policy.entrypoint("custom_builtins/valid_json").evaluate("{}"));
+        assertTrue(result.asBoolean());
+    }
 }

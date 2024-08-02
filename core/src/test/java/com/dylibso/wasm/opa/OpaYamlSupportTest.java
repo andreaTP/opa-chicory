@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.dylibso.wasm.opa.builtins.Yaml;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -26,8 +25,7 @@ public class OpaYamlSupportTest {
                                         "yaml/support/hasYAMLWarning",
                                         "yaml/support/canMarshalYAML",
                                         "yaml/support/isValidYAML")
-                                .resolve("policy.wasm"),
-                        new OpaDefaultImports(Yaml.all()));
+                                .resolve("policy.wasm"));
     }
 
     @Test
