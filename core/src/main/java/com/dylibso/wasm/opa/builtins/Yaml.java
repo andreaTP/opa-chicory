@@ -1,8 +1,5 @@
 package com.dylibso.wasm.opa.builtins;
 
-import static com.dylibso.wasm.opa.Opa.OpaPolicy.dumpJson;
-import static com.dylibso.wasm.opa.Opa.OpaPolicy.loadJson;
-
 import com.dylibso.wasm.opa.Builtin;
 import com.dylibso.wasm.opa.OpaWasm;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,7 +11,23 @@ public class Yaml {
 
     public static ObjectMapper jsonMapper = new ObjectMapper();
     public static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+
     // maybe: .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+
+    private static int loadJson(OpaWasm wasm, String data) {
+        var dataStrAddr = wasm.opaMalloc(data.length());
+        wasm.memory().writeCString(dataStrAddr, data);
+        var dstAddr = wasm.opaJsonParse(dataStrAddr, data.length());
+        wasm.opaFree(dataStrAddr);
+        return dstAddr;
+    }
+
+    private static String dumpJson(OpaWasm wasm, int addr) {
+        int resultStrAddr = wasm.opaJsonDump(addr);
+        var result = wasm.memory().readCString(resultStrAddr);
+        wasm.opaFree(resultStrAddr);
+        return result;
+    }
 
     public static final Builtin.Builtin1 isValid =
             new Builtin.Builtin1(

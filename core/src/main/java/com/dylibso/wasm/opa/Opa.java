@@ -47,7 +47,12 @@ public class Opa {
             // map the builtins
             try {
                 var mappings = new HashMap<String, Integer>();
-                var fields = mapper.readTree(dumpJson(wasm, wasm.builtins())).fields();
+                int builtinsAddr = wasm.builtins();
+                var builtinsStrAddr = wasm.opaJsonDump(builtinsAddr);
+                var builtinsStr = wasm.memory().readCString(builtinsStrAddr);
+                wasm.opaFree(builtinsStrAddr);
+                wasm.opaFree(builtinsAddr);
+                var fields = mapper.readTree(builtinsStr).fields();
                 while (fields.hasNext()) {
                     var field = fields.next();
                     mappings.put(field.getKey(), field.getValue().intValue());
@@ -68,7 +73,7 @@ public class Opa {
             return this;
         }
 
-        public static int loadJson(OpaWasm wasm, String data) {
+        public int loadJson(String data) {
             var dataStrAddr = wasm.opaMalloc(data.length());
             wasm.memory().writeCString(dataStrAddr, data);
             var dstAddr = wasm.opaJsonParse(dataStrAddr, data.length());
@@ -76,7 +81,7 @@ public class Opa {
             return dstAddr;
         }
 
-        public static String dumpJson(OpaWasm wasm, int addr) {
+        public String dumpJson(int addr) {
             int resultStrAddr = wasm.opaJsonDump(addr);
             var result = wasm.memory().readCString(resultStrAddr);
             wasm.opaFree(resultStrAddr);
@@ -87,7 +92,7 @@ public class Opa {
         // stringified JSON
         public OpaPolicy data(String data) {
             wasm.opaHeapPtrSet(this.baseHeapPtr);
-            this.dataAddr = loadJson(wasm, data);
+            this.dataAddr = loadJson(data);
             this.dataHeapPtr = wasm.opaHeapPtrGet();
             return this;
         }
@@ -104,13 +109,13 @@ public class Opa {
                 }
             }
 
-            this.inputAddr = loadJson(wasm, input);
+            this.inputAddr = loadJson(input);
             return this;
         }
 
         public int findEntrypoint(String name) {
             try {
-                var json = dumpJson(wasm, wasm.entrypoints());
+                var json = dumpJson(wasm.entrypoints());
                 var entrypoints = mapper.readTree(json);
                 if (!entrypoints.has(name)) {
                     throw new IllegalArgumentException(
@@ -142,7 +147,7 @@ public class Opa {
             }
 
             this.resultAddr = wasm.opaEvalCtxGetResult(ctxAddr);
-            var result = dumpJson(wasm, resultAddr);
+            var result = dumpJson(resultAddr);
             return result;
         }
 
