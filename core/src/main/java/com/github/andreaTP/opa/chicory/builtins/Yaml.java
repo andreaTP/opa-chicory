@@ -1,12 +1,12 @@
 package com.github.andreaTP.opa.chicory.builtins;
 
-import com.github.andreaTP.opa.chicory.OpaBuiltin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.github.andreaTP.opa.chicory.OpaBuiltin;
 
 public class Yaml {
     public static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());

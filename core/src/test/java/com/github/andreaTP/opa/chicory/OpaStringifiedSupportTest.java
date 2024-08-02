@@ -55,7 +55,8 @@ public class OpaStringifiedSupportTest {
         assertTrue(positiveResult.findValue("hasPermission").asBoolean());
 
         var negativeResult =
-                Utils.getResult(policy.evaluate(Utils.jsonPrettyPrint("{ \"secret\" : \"wrong\" }")));
+                Utils.getResult(
+                        policy.evaluate(Utils.jsonPrettyPrint("{ \"secret\" : \"wrong\" }")));
         assertFalse(negativeResult.findValue("hasPermission").asBoolean());
     }
 

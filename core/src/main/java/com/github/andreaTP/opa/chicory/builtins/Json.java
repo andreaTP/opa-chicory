@@ -1,10 +1,10 @@
 package com.github.andreaTP.opa.chicory.builtins;
 
-import com.github.andreaTP.opa.chicory.OpaBuiltin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.github.andreaTP.opa.chicory.Opa;
+import com.github.andreaTP.opa.chicory.OpaBuiltin;
 
 public class Json {
 

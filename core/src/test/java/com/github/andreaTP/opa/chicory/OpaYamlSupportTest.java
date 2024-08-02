@@ -35,7 +35,8 @@ public class OpaYamlSupportTest {
     @Test
     public void shouldIgnoreYamlSyntaxErrors() throws Exception {
         var result =
-                Utils.objectMapper.readTree(policy.entrypoint("yaml/support/hasSyntaxError").evaluate());
+                Utils.objectMapper.readTree(
+                        policy.entrypoint("yaml/support/hasSyntaxError").evaluate());
         assertTrue(result.isArray());
         assertFalse(result.elements().hasNext());
     }
@@ -61,7 +62,8 @@ public class OpaYamlSupportTest {
     @Test
     public void shouldIgnoreYamlWarnings() throws Exception {
         var result =
-                Utils.objectMapper.readTree(policy.entrypoint("yaml/support/hasYAMLWarning").evaluate());
+                Utils.objectMapper.readTree(
+                        policy.entrypoint("yaml/support/hasYAMLWarning").evaluate());
         assertTrue(result.isArray());
         assertFalse(result.elements().hasNext());
     }

@@ -111,7 +111,8 @@ public class OpaCustomBuiltinsTest {
 
     @Test
     public void shouldCallAProvidedBuiltinOverACustomBuiltin() {
-        var result = Utils.getResult(policy.entrypoint("custom_builtins/valid_json").evaluate("{}"));
+        var result =
+                Utils.getResult(policy.entrypoint("custom_builtins/valid_json").evaluate("{}"));
         assertTrue(result.asBoolean());
     }
 }

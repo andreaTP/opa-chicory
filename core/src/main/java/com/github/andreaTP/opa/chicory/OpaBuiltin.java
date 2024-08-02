@@ -193,7 +193,8 @@ public class OpaBuiltin {
                     try {
                         var inputStr1 = Opa.jsonMapper.readTree(instance.readString(strAddr1));
                         var inputStr2 = Opa.jsonMapper.readTree(instance.readString(strAddr2));
-                        var result = Opa.jsonMapper.writeValueAsString(fn.apply(inputStr1, inputStr2));
+                        var result =
+                                Opa.jsonMapper.writeValueAsString(fn.apply(inputStr1, inputStr2));
                         return instance.writeResult(result);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);

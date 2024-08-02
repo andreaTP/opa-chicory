@@ -3,6 +3,7 @@ package com.github.andreaTP.opa.chicory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -91,5 +92,42 @@ public class OpaCli {
         }
 
         return targetFolder;
+    }
+
+    public static Path testcasesDestFolder = Path.of("target", "testcases");
+    private static String testcasesTar = "testcases.tar.gz";
+    private static Path testcasesCapabilitiesFile =
+            Path.of("src", "test", "resources", "capabilities.json");
+
+    public static void prepareTestcases() {
+        try {
+            Files.copy(
+                    Path.of("..", testcasesTar),
+                    testcasesDestFolder.resolve(testcasesTar),
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "testcases.tar.gz file not found in root, please download it ... let figure out"
+                            + " how!",
+                    e);
+        }
+        List<String> tarCommand = new ArrayList<>();
+        tarCommand.add("tar");
+        tarCommand.add("-xf");
+        tarCommand.add(testcasesTar);
+        // System.out.println("Going to execute command: " + String.join(" ", tarCommand));
+
+        ProcessBuilder tarPb = new ProcessBuilder(tarCommand);
+        tarPb.directory(testcasesDestFolder.toFile());
+        tarPb.inheritIO();
+        Process tarPs;
+        try {
+            tarPs = tarPb.start();
+            tarPs.waitFor(10, TimeUnit.SECONDS);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
