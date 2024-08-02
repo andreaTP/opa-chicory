@@ -9,13 +9,13 @@ public class OpaDefaultImports implements OpaImports {
     // TODO: review the default min, max limits
     // hold a reference to the runtime memory
     protected final Memory memory;
-    protected Builtin.IBuiltin[] builtins = new Builtin.IBuiltin[0];
+    protected OpaBuiltin.Builtin[] builtins = new OpaBuiltin.Builtin[0];
 
     public OpaDefaultImports() {
         this(10, MemoryLimits.MAX_PAGES);
     }
 
-    public OpaDefaultImports(Builtin.IBuiltin... builtins) {
+    public OpaDefaultImports(OpaBuiltin.Builtin... builtins) {
         this(10, MemoryLimits.MAX_PAGES, builtins);
     }
 
@@ -23,14 +23,14 @@ public class OpaDefaultImports implements OpaImports {
         this.memory = new Memory(new MemoryLimits(initial, maximum));
     }
 
-    public OpaDefaultImports(int initial, int maximum, Builtin.IBuiltin... builtins) {
+    public OpaDefaultImports(int initial, int maximum, OpaBuiltin.Builtin... builtins) {
         this.builtins = builtins;
         this.memory = new Memory(new MemoryLimits(initial, maximum));
     }
 
     @Override
     public void initializeBuiltins(Map<String, Integer> mappings) {
-        var result = new Builtin.IBuiltin[mappings.size()];
+        var result = new OpaBuiltin.Builtin[mappings.size()];
         // Default initialization to have proper error messages
         for (var m : mappings.entrySet()) {
             result[m.getValue()] = () -> m.getKey();
@@ -61,33 +61,27 @@ public class OpaDefaultImports implements OpaImports {
 
     @Override
     public int opaBuiltin0(OpaWasm instance, int builtinId, int ctx) {
-        if (builtinId > 0 && builtinId < builtins.length && builtins[builtinId] != null) {
-            return builtins[builtinId].asBuiltin0(instance);
-        }
-        throw new RuntimeException("opa_builtin0 - " + builtinId + "- not implemented");
+        return builtins[builtinId].asBuiltin0(instance);
     }
 
     @Override
     public int opaBuiltin1(OpaWasm instance, int builtinId, int ctx, int _1) {
-        if (builtinId >= 0 && builtinId < builtins.length && builtins[builtinId] != null) {
-            return builtins[builtinId].asBuiltin1(instance, _1);
-        }
-        throw new RuntimeException("opa_builtin1 - " + builtinId + " - not implemented");
+        return builtins[builtinId].asBuiltin1(instance, _1);
     }
 
     @Override
     public int opaBuiltin2(OpaWasm instance, int builtinId, int ctx, int _1, int _2) {
-        throw new RuntimeException("opa_builtin2 - not implemented");
+        return builtins[builtinId].asBuiltin2(instance, _1, _2);
     }
 
     @Override
     public int opaBuiltin3(OpaWasm instance, int builtinId, int ctx, int _1, int _2, int _3) {
-        throw new RuntimeException("opa_builtin3 - not implemented");
+        return builtins[builtinId].asBuiltin3(instance, _1, _2, _3);
     }
 
     @Override
     public int opaBuiltin4(
             OpaWasm instance, int builtinId, int ctx, int _1, int _2, int _3, int _4) {
-        throw new RuntimeException("opa_builtin4 - not implemented");
+        return builtins[builtinId].asBuiltin4(instance, _1, _2, _3, _4);
     }
 }

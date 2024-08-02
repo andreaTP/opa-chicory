@@ -1,6 +1,6 @@
 package com.dylibso.wasm.opa.builtins;
 
-import com.dylibso.wasm.opa.Builtin;
+import com.dylibso.wasm.opa.OpaBuiltin;
 import com.dylibso.wasm.opa.OpaWasm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +13,8 @@ public class Yaml {
     public static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     // maybe: .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
 
-    public static final Builtin.Builtin1 isValid =
-            new Builtin.Builtin1(
+    public static final OpaBuiltin.Builtin1 isValid =
+            new OpaBuiltin.Builtin1(
                     "yaml.is_valid",
                     (OpaWasm instance, int strAddr) -> {
                         var boxedYamlStr = instance.readString(strAddr);
@@ -43,8 +43,8 @@ public class Yaml {
                         return instance.writeResult(jsonStr);
                     });
 
-    public static final Builtin.Builtin1 unmarshal =
-            new Builtin.Builtin1(
+    public static final OpaBuiltin.Builtin1 unmarshal =
+            new OpaBuiltin.Builtin1(
                     "yaml.unmarshal",
                     (OpaWasm instance, int strAddr) -> {
                         var boxedYamlStr = instance.readString(strAddr);
@@ -67,8 +67,8 @@ public class Yaml {
                         }
                     });
 
-    public static final Builtin.Builtin1 marshal =
-            new Builtin.Builtin1(
+    public static final OpaBuiltin.Builtin1 marshal =
+            new OpaBuiltin.Builtin1(
                     "yaml.marshal",
                     (OpaWasm instance, int strAddr) -> {
                         var jsonStr = instance.readString(strAddr);
@@ -83,7 +83,7 @@ public class Yaml {
                         }
                     });
 
-    public static Builtin.IBuiltin[] all() {
-        return new Builtin.IBuiltin[] {isValid, marshal, unmarshal};
+    public static OpaBuiltin.Builtin[] all() {
+        return new OpaBuiltin.Builtin[] {isValid, marshal, unmarshal};
     }
 }
