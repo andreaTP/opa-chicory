@@ -37,11 +37,6 @@ public class OpaYamlSupportTest {
         assertTrue(result.asBoolean());
     }
 
-    //    it("should unmarshall YAML strings", () => {
-    //    const result = policy.evaluate({}, "yaml/support/canParseYAML");
-    //        expect(result.length).not.toBe(0);
-    //        expect(result[0]).toMatchObject({ result: true });
-    //    });
     //
     //    it("should ignore YAML syntax errors", () => {
     //        expect(() => policy.evaluate({}, "yaml/support/hasSyntaxError")).not

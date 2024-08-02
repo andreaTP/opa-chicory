@@ -1,5 +1,7 @@
 package com.dylibso.wasm.opa;
 
+import java.util.function.Function;
+
 public class OpaBuiltin {
     private OpaBuiltin() {}
 
@@ -150,5 +152,16 @@ public class OpaBuiltin {
         public int asBuiltin4(OpaWasm instance, int _1, int _2, int _3, int _4) {
             return fn.apply(instance, _1, _2, _3, _4);
         }
+    }
+
+    // helpers for a convenient API
+    public static Builtin from(String name, Function<String, String> fn) {
+        return new OpaBuiltin.Builtin1(
+                name,
+                (OpaWasm instance, int strAddr) -> {
+                    var inputStr = instance.readString(strAddr);
+                    var result = fn.apply(inputStr);
+                    return instance.writeResult(result);
+                });
     }
 }
