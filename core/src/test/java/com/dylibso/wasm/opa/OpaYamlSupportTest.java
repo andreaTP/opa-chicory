@@ -31,12 +31,11 @@ public class OpaYamlSupportTest {
                         new OpaDefaultImports(Yaml.all()));
     }
 
-    //        @Test
-    //        public void shouldUnmarshallYamlStrings() {
-    //            var result =
-    // getResult(policy.entrypoint("yaml/support/canParseYAML").evaluate("{}"));
-    //            assertTrue(result.asBoolean());
-    //        }
+    @Test
+    public void shouldUnmarshallYamlStrings() {
+        var result = getResult(policy.entrypoint("yaml/support/canParseYAML").evaluate("{}"));
+        assertTrue(result.asBoolean());
+    }
 
     //    it("should unmarshall YAML strings", () => {
     //    const result = policy.evaluate({}, "yaml/support/canParseYAML");
@@ -90,10 +89,4 @@ public class OpaYamlSupportTest {
         var result = getResult(policy.entrypoint("yaml/support/isValidYAML").evaluate("{}"));
         assertTrue(result.asBoolean());
     }
-    //
-    //    it("should validate yaml", () => {
-    //    const result = policy.evaluate({}, "yaml/support/isValidYAML");
-    //        expect(result.length).toBe(1);
-    //        expect(result[0]).toMatchObject({ result: true });
-    //    });
 }

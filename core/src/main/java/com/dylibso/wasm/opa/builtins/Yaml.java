@@ -4,6 +4,7 @@ import com.dylibso.wasm.opa.Builtin;
 import com.dylibso.wasm.opa.OpaWasm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class Yaml {
@@ -11,6 +12,13 @@ public class Yaml {
     public static ObjectMapper jsonMapper = new ObjectMapper();
     public static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     // maybe: .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+
+    //    private static final String readString(OpaWasm instance, int addr) {
+    //        int resultAddr = instance.opaJsonDump(addr);
+    //        var resultStr = instance.memory().readCString(resultAddr);
+    //        instance.opaFree(resultAddr);
+    //        return resultStr;
+    //    }
 
     public static final Builtin.Builtin1 isValid =
             new Builtin.Builtin1(
@@ -52,15 +60,28 @@ public class Yaml {
             new Builtin.Builtin1(
                     "yaml.unmarshal",
                     (OpaWasm instance, int strAddr) -> {
-                        var yamlStr = instance.memory().readCString(strAddr);
+                        int resultYamlAddr = instance.opaJsonDump(strAddr);
+                        var boxedYamlStr = instance.memory().readCString(resultYamlAddr);
+                        instance.opaFree(resultYamlAddr);
                         try {
-                            var tree = yamlMapper.readTree(yamlStr);
-                            var jsonStr = jsonMapper.writeValueAsString(tree);
-                            var jsonAddr = instance.opaMalloc(jsonStr.length());
-                            instance.memory().writeCString(jsonAddr, jsonStr);
-                            var resultAddr = instance.opaJsonParse(jsonAddr, jsonStr.length());
-                            instance.opaFree(jsonAddr);
-                            return resultAddr;
+                            var boxedYaml = jsonMapper.readTree(boxedYamlStr);
+                            if (!boxedYaml.isTextual()) {
+                                throw new RuntimeException(
+                                        "yaml is not correctly boxed in a Json string");
+                            } else {
+                                try {
+                                    var tree = yamlMapper.readTree(boxedYaml.asText());
+                                    var jsonStr = jsonMapper.writeValueAsString(tree);
+                                    var jsonAddr = instance.opaMalloc(jsonStr.length());
+                                    instance.memory().writeCString(jsonAddr, jsonStr);
+                                    var resultAddr =
+                                            instance.opaJsonParse(jsonAddr, jsonStr.length());
+                                    instance.opaFree(jsonAddr);
+                                    return resultAddr;
+                                } catch (JsonProcessingException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
                         }
@@ -70,15 +91,20 @@ public class Yaml {
             new Builtin.Builtin1(
                     "yaml.marshal",
                     (OpaWasm instance, int strAddr) -> {
-                        int resultYamlAddr = instance.opaJsonDump(strAddr);
-                        var yamlStr = instance.memory().readCString(resultYamlAddr);
-                        instance.opaFree(resultYamlAddr);
+                        int resultJsonAddr = instance.opaJsonDump(strAddr);
+                        var jsonStr = instance.memory().readCString(resultJsonAddr);
+                        instance.opaFree(resultJsonAddr);
                         try {
-                            var yaml = yamlMapper.readTree(yamlStr);
-                            var resultStr = yamlMapper.writeValueAsString(yaml);
+                            var json = jsonMapper.readTree(jsonStr);
+                            var resultStr =
+                                    jsonMapper.writeValueAsString(
+                                            TextNode.valueOf(yamlMapper.writeValueAsString(json)));
                             var resultStrAddr = instance.opaMalloc(resultStr.length());
                             instance.memory().writeCString(resultStrAddr, resultStr);
-                            return resultStrAddr;
+                            var resultAddr =
+                                    instance.opaJsonParse(resultStrAddr, resultStr.length());
+                            instance.opaFree(resultStrAddr);
+                            return resultAddr;
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
                         }
