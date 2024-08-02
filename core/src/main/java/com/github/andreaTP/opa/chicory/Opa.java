@@ -1,4 +1,4 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
 import com.dylibso.chicory.runtime.Memory;
 import com.fasterxml.jackson.core.JsonProcessingException;

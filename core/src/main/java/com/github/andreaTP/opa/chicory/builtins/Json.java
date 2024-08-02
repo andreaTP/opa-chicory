@@ -1,11 +1,10 @@
-package com.dylibso.wasm.opa.builtins;
+package com.github.andreaTP.opa.chicory.builtins;
 
-import static com.dylibso.wasm.opa.Opa.jsonMapper;
-
-import com.dylibso.wasm.opa.OpaBuiltin;
+import com.github.andreaTP.opa.chicory.OpaBuiltin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.github.andreaTP.opa.chicory.Opa;
 
 public class Json {
 
@@ -14,7 +13,7 @@ public class Json {
             return BooleanNode.getFalse();
         } else {
             try {
-                jsonMapper.readTree(boxedJson.asText());
+                Opa.jsonMapper.readTree(boxedJson.asText());
                 return BooleanNode.getTrue();
             } catch (JsonProcessingException e) {
                 return BooleanNode.getFalse();

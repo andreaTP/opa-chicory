@@ -1,6 +1,6 @@
-package com.dylibso.wasm.opa.builtins;
+package com.github.andreaTP.opa.chicory.builtins;
 
-import com.dylibso.wasm.opa.OpaBuiltin;
+import com.github.andreaTP.opa.chicory.OpaBuiltin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

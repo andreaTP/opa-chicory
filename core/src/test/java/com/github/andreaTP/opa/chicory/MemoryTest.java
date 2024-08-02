@@ -1,12 +1,13 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
-import static com.dylibso.wasm.opa.Utils.rootCauseMessage;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.dylibso.chicory.runtime.exceptions.WASMMachineException;
 import java.nio.file.Path;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ public class MemoryTest {
         var policy = Opa.loadPolicy(wasmFile, new OpaDefaultImports(3, 4));
         var input = new String(new char[2 * 65536]).replace("\0", "a");
         var exception = assertThrows(WASMMachineException.class, () -> policy.input(input));
-        assertEquals("opa_abort - opa_malloc: failed", rootCauseMessage(exception));
+        Assertions.assertEquals("opa_abort - opa_malloc: failed", Utils.rootCauseMessage(exception));
     }
 
     @Test

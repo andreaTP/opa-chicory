@@ -1,6 +1,4 @@
-package com.dylibso.wasm.opa;
-
-import static com.dylibso.wasm.opa.Opa.jsonMapper;
+package com.github.andreaTP.opa.chicory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -166,7 +164,7 @@ public class OpaBuiltin {
                 name,
                 (OpaWasm instance) -> {
                     try {
-                        var result = jsonMapper.writeValueAsString(fn.get());
+                        var result = Opa.jsonMapper.writeValueAsString(fn.get());
                         return instance.writeResult(result);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
@@ -179,8 +177,8 @@ public class OpaBuiltin {
                 name,
                 (OpaWasm instance, int strAddr) -> {
                     try {
-                        var inputStr = jsonMapper.readTree(instance.readString(strAddr));
-                        var result = jsonMapper.writeValueAsString(fn.apply(inputStr));
+                        var inputStr = Opa.jsonMapper.readTree(instance.readString(strAddr));
+                        var result = Opa.jsonMapper.writeValueAsString(fn.apply(inputStr));
                         return instance.writeResult(result);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
@@ -193,9 +191,9 @@ public class OpaBuiltin {
                 name,
                 (OpaWasm instance, int strAddr1, int strAddr2) -> {
                     try {
-                        var inputStr1 = jsonMapper.readTree(instance.readString(strAddr1));
-                        var inputStr2 = jsonMapper.readTree(instance.readString(strAddr2));
-                        var result = jsonMapper.writeValueAsString(fn.apply(inputStr1, inputStr2));
+                        var inputStr1 = Opa.jsonMapper.readTree(instance.readString(strAddr1));
+                        var inputStr2 = Opa.jsonMapper.readTree(instance.readString(strAddr2));
+                        var result = Opa.jsonMapper.writeValueAsString(fn.apply(inputStr1, inputStr2));
                         return instance.writeResult(result);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
@@ -213,11 +211,11 @@ public class OpaBuiltin {
                 name,
                 (OpaWasm instance, int strAddr1, int strAddr2, int strAddr3) -> {
                     try {
-                        var inputStr1 = jsonMapper.readTree(instance.readString(strAddr1));
-                        var inputStr2 = jsonMapper.readTree(instance.readString(strAddr2));
-                        var inputStr3 = jsonMapper.readTree(instance.readString(strAddr3));
+                        var inputStr1 = Opa.jsonMapper.readTree(instance.readString(strAddr1));
+                        var inputStr2 = Opa.jsonMapper.readTree(instance.readString(strAddr2));
+                        var inputStr3 = Opa.jsonMapper.readTree(instance.readString(strAddr3));
                         var result =
-                                jsonMapper.writeValueAsString(
+                                Opa.jsonMapper.writeValueAsString(
                                         fn.apply(inputStr1, inputStr2, inputStr3));
                         return instance.writeResult(result);
                     } catch (JsonProcessingException e) {
@@ -236,12 +234,12 @@ public class OpaBuiltin {
                 name,
                 (OpaWasm instance, int strAddr1, int strAddr2, int strAddr3, int strAddr4) -> {
                     try {
-                        var inputStr1 = jsonMapper.readTree(instance.readString(strAddr1));
-                        var inputStr2 = jsonMapper.readTree(instance.readString(strAddr2));
-                        var inputStr3 = jsonMapper.readTree(instance.readString(strAddr3));
-                        var inputStr4 = jsonMapper.readTree(instance.readString(strAddr4));
+                        var inputStr1 = Opa.jsonMapper.readTree(instance.readString(strAddr1));
+                        var inputStr2 = Opa.jsonMapper.readTree(instance.readString(strAddr2));
+                        var inputStr3 = Opa.jsonMapper.readTree(instance.readString(strAddr3));
+                        var inputStr4 = Opa.jsonMapper.readTree(instance.readString(strAddr4));
                         var result =
-                                jsonMapper.writeValueAsString(
+                                Opa.jsonMapper.writeValueAsString(
                                         fn.apply(inputStr1, inputStr2, inputStr3, inputStr4));
                         return instance.writeResult(result);
                     } catch (JsonProcessingException e) {

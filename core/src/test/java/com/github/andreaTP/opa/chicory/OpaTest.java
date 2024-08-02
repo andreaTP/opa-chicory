@@ -1,25 +1,28 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class OpaTest {
-    ObjectMapper objectMapper = new ObjectMapper();
+    static Path wasmFile;
+
+    @BeforeAll
+    public static void beforeAll() throws Exception {
+        wasmFile = OpaCli.compile("base", "opa/wasm/test/allowed").resolve("policy.wasm");
+    }
 
     @Test
     public void lowLevelAPI() throws Exception {
         var imports = new OpaDefaultImports();
-        var opa =
-                new OpaWasm(
-                        imports,
-                        new FileInputStream(new File("src/test/resources/opa/policy.wasm")));
+        var opa = new OpaWasm(imports, new FileInputStream(wasmFile.toFile()));
 
         assertEquals(opa.opaWasmAbiVersion(), 1);
         assertEquals(opa.opaWasmAbiMinorVersion(), 3);
@@ -61,39 +64,28 @@ public class OpaTest {
         opa.opaValueFree(resultAddr);
     }
 
-    private boolean readSingleBool(String input) throws JsonProcessingException {
-        return objectMapper.readTree(input).elements().next().findValue("result").asBoolean();
-    }
-
     @Test
     public void highLevelAPI() throws Exception {
-        var policy = Opa.loadPolicy(new File("src/test/resources/opa/policy.wasm"));
+        var policy = Opa.loadPolicy(wasmFile);
         policy.data("{ \"role\" : { \"alice\" : \"admin\", \"bob\" : \"user\" } }");
 
         // evaluate the admin
         policy.input("{\"user\": \"alice\"}");
-        assertTrue(readSingleBool(policy.evaluate()));
+        Assertions.assertTrue(Utils.getResult(policy.evaluate()).asBoolean());
 
         // evaluate a user
         policy.input("{\"user\": \"bob\"}");
-        assertFalse(readSingleBool(policy.evaluate()));
+        Assertions.assertFalse(Utils.getResult(policy.evaluate()).asBoolean());
 
         // change the data of the policy
         policy.data("{ \"role\" : { \"bob\" : \"admin\", \"alice\" : \"user\" } }");
 
         // evaluate the admin
         policy.input("{\"user\": \"bob\"}");
-        assertTrue(readSingleBool(policy.evaluate()));
+        Assertions.assertTrue(Utils.getResult(policy.evaluate()).asBoolean());
 
         // evaluate a user
         policy.input("{\"user\": \"alice\"}");
-        assertFalse(readSingleBool(policy.evaluate()));
-
-        // throws:
-        // com.dylibso.chicory.runtime.exceptions.WASMRuntimeException: integer divide by zero
-        // is it expected?
-        // evaluate an in-existent user
-        //            opa.setInput("{\"user\": \"charles\"}");
-        //            assertFalse(readSingleBool(opa.evaluate()));
+        Assertions.assertFalse(Utils.getResult(policy.evaluate()).asBoolean());
     }
 }

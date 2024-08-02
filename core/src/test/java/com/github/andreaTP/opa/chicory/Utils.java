@@ -1,4 +1,4 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

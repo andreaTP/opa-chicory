@@ -1,6 +1,5 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
-import static com.dylibso.wasm.opa.Utils.getResult;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +21,7 @@ public class MultipleEntrypointsTest {
     @Test
     public void shouldRunWithDefaultEntrypoint() throws Exception {
         var policy = Opa.loadPolicy(wasmFile);
-        var result = getResult(policy.evaluate());
+        var result = Utils.getResult(policy.evaluate());
 
         assertTrue(result.size() > 0);
         assertTrue(result.has("one"));
@@ -34,7 +33,7 @@ public class MultipleEntrypointsTest {
         var policy = Opa.loadPolicy(wasmFile);
         policy.input("{}").entrypoint("example/one");
 
-        var result = getResult(policy.evaluate());
+        var result = Utils.getResult(policy.evaluate());
 
         assertTrue(result.size() > 0);
         assertFalse(result.findValue("myRule").asBoolean());
@@ -46,7 +45,7 @@ public class MultipleEntrypointsTest {
         var policy = Opa.loadPolicy(wasmFile);
         policy.input("{}").entrypoint("example/two");
 
-        var result = getResult(policy.evaluate());
+        var result = Utils.getResult(policy.evaluate());
 
         assertTrue(result.size() > 0);
         assertFalse(result.findValue("ourRule").asBoolean());

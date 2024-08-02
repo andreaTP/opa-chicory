@@ -1,4 +1,4 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

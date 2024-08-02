@@ -1,6 +1,6 @@
-package com.dylibso.wasm.opa.builtins;
+package com.github.andreaTP.opa.chicory.builtins;
 
-import com.dylibso.wasm.opa.OpaBuiltin;
+import com.github.andreaTP.opa.chicory.OpaBuiltin;
 import java.util.Arrays;
 
 public class Provided {

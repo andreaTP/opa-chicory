@@ -1,4 +1,4 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
 public enum OpaErrorCode {
     OPA_ERR_OK, // OPA_ERR_OK	No error.

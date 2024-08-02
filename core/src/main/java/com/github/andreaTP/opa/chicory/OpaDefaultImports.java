@@ -1,8 +1,8 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
 import com.dylibso.chicory.runtime.Memory;
 import com.dylibso.chicory.wasm.types.MemoryLimits;
-import com.dylibso.wasm.opa.builtins.Provided;
+import com.github.andreaTP.opa.chicory.builtins.Provided;
 import java.util.Map;
 
 // to be implemented by the user

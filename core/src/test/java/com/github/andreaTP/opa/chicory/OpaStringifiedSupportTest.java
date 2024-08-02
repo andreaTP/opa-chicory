@@ -1,7 +1,5 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
-import static com.dylibso.wasm.opa.Utils.getResult;
-import static com.dylibso.wasm.opa.Utils.jsonPrettyPrint;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,10 +35,10 @@ public class OpaStringifiedSupportTest {
         var policy = Opa.loadPolicy(wasmFile);
         policy.data(data);
 
-        var positiveResult = getResult(policy.evaluate("{ \"secret\" : \"secret\" }"));
+        var positiveResult = Utils.getResult(policy.evaluate("{ \"secret\" : \"secret\" }"));
         assertTrue(positiveResult.findValue("hasPermission").asBoolean());
 
-        var negativeResult = getResult(policy.evaluate("{ \"secret\" : \"wrong\" }"));
+        var negativeResult = Utils.getResult(policy.evaluate("{ \"secret\" : \"wrong\" }"));
         assertFalse(negativeResult.findValue("hasPermission").asBoolean());
     }
 
@@ -50,14 +48,14 @@ public class OpaStringifiedSupportTest {
         policy.data(data);
 
         var positiveResult =
-                getResult(
+                Utils.getResult(
                         policy.evaluate(
-                                jsonPrettyPrint(
+                                Utils.jsonPrettyPrint(
                                         "{ \"permissions\" : [\"view:account-billing\"] }")));
         assertTrue(positiveResult.findValue("hasPermission").asBoolean());
 
         var negativeResult =
-                getResult(policy.evaluate(jsonPrettyPrint("{ \"secret\" : \"wrong\" }")));
+                Utils.getResult(policy.evaluate(Utils.jsonPrettyPrint("{ \"secret\" : \"wrong\" }")));
         assertFalse(negativeResult.findValue("hasPermission").asBoolean());
     }
 
@@ -66,10 +64,10 @@ public class OpaStringifiedSupportTest {
         var policy = Opa.loadPolicy(wasmFile);
         policy.entrypoint("stringified/support/plainInputBoolean");
 
-        var positiveResult = getResult(policy.evaluate(jsonPrettyPrint("true")));
+        var positiveResult = Utils.getResult(policy.evaluate(Utils.jsonPrettyPrint("true")));
         assertTrue(positiveResult.asBoolean());
 
-        var negativeResult = getResult(policy.evaluate(jsonPrettyPrint("false")));
+        var negativeResult = Utils.getResult(policy.evaluate(Utils.jsonPrettyPrint("false")));
         assertFalse(negativeResult.asBoolean());
     }
 
@@ -78,10 +76,10 @@ public class OpaStringifiedSupportTest {
         var policy = Opa.loadPolicy(wasmFile);
         policy.entrypoint("stringified/support/plainInputNumber");
 
-        var positiveResult = getResult(policy.evaluate(jsonPrettyPrint("5")));
+        var positiveResult = Utils.getResult(policy.evaluate(Utils.jsonPrettyPrint("5")));
         assertTrue(positiveResult.asBoolean());
 
-        var negativeResult = getResult(policy.evaluate(jsonPrettyPrint("6")));
+        var negativeResult = Utils.getResult(policy.evaluate(Utils.jsonPrettyPrint("6")));
         assertFalse(negativeResult.asBoolean());
     }
 
@@ -90,10 +88,10 @@ public class OpaStringifiedSupportTest {
         var policy = Opa.loadPolicy(wasmFile);
         policy.entrypoint("stringified/support/plainInputString");
 
-        var positiveResult = getResult(policy.evaluate(jsonPrettyPrint("\"test\"")));
+        var positiveResult = Utils.getResult(policy.evaluate(Utils.jsonPrettyPrint("\"test\"")));
         assertTrue(positiveResult.asBoolean());
 
-        var negativeResult = getResult(policy.evaluate(jsonPrettyPrint("\"invalid\"")));
+        var negativeResult = Utils.getResult(policy.evaluate(Utils.jsonPrettyPrint("\"invalid\"")));
         assertFalse(negativeResult.asBoolean());
     }
 }

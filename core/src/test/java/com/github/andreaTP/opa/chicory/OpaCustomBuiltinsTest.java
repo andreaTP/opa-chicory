@@ -1,6 +1,5 @@
-package com.dylibso.wasm.opa;
+package com.github.andreaTP.opa.chicory;
 
-import static com.dylibso.wasm.opa.Utils.getResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -69,14 +68,14 @@ public class OpaCustomBuiltinsTest {
 
     @Test
     public void shouldCallZeroArgBuiltin() {
-        var result = getResult(policy.entrypoint("custom_builtins/zero_arg").evaluate());
+        var result = Utils.getResult(policy.entrypoint("custom_builtins/zero_arg").evaluate());
         assertEquals("hello", result.asText());
     }
 
     @Test
     public void shouldCallACustomOneArgBuiltin() {
         var result =
-                getResult(
+                Utils.getResult(
                         policy.entrypoint("custom_builtins/one_arg")
                                 .evaluate("{ \"args\": [\"arg0\"] }"));
         assertEquals("hello arg0", result.asText());
@@ -85,7 +84,7 @@ public class OpaCustomBuiltinsTest {
     @Test
     public void shouldCallACustomTwoArgBuiltin() {
         var result =
-                getResult(
+                Utils.getResult(
                         policy.entrypoint("custom_builtins/two_arg")
                                 .evaluate("{ \"args\": [\"arg0\", \"arg1\"] }"));
         assertEquals("hello arg0, arg1", result.asText());
@@ -94,7 +93,7 @@ public class OpaCustomBuiltinsTest {
     @Test
     public void shouldCallACustomThreeArgBuiltin() {
         var result =
-                getResult(
+                Utils.getResult(
                         policy.entrypoint("custom_builtins/three_arg")
                                 .evaluate("{ \"args\": [\"arg0\", \"arg1\", \"arg2\"] }"));
         assertEquals("hello arg0, arg1, arg2", result.asText());
@@ -103,7 +102,7 @@ public class OpaCustomBuiltinsTest {
     @Test
     public void shouldCallACustomFourArgBuiltin() {
         var result =
-                getResult(
+                Utils.getResult(
                         policy.entrypoint("custom_builtins/four_arg")
                                 .evaluate(
                                         "{ \"args\": [\"arg0\", \"arg1\", \"arg2\", \"arg3\"] }"));
@@ -112,7 +111,7 @@ public class OpaCustomBuiltinsTest {
 
     @Test
     public void shouldCallAProvidedBuiltinOverACustomBuiltin() {
-        var result = getResult(policy.entrypoint("custom_builtins/valid_json").evaluate("{}"));
+        var result = Utils.getResult(policy.entrypoint("custom_builtins/valid_json").evaluate("{}"));
         assertTrue(result.asBoolean());
     }
 }
