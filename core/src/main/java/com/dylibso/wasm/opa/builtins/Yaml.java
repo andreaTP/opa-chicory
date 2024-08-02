@@ -11,7 +11,6 @@ public class Yaml {
 
     public static ObjectMapper jsonMapper = new ObjectMapper();
     public static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-
     // maybe: .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
 
     private static int loadJson(OpaWasm wasm, String data) {
@@ -33,6 +32,7 @@ public class Yaml {
             new Builtin.Builtin1(
                     "yaml.is_valid",
                     (OpaWasm instance, int strAddr) -> {
+                        System.out.println("Yaml is valid");
                         var str = dumpJson(instance, strAddr);
                         try {
                             yamlMapper.readTree(str);
@@ -51,6 +51,7 @@ public class Yaml {
             new Builtin.Builtin1(
                     "yaml.unmarshal",
                     (OpaWasm instance, int strAddr) -> {
+                        System.out.println("Yaml unmarshal");
                         var str = dumpJson(instance, strAddr);
                         try {
                             var tree = yamlMapper.readTree(jsonMapper.readTree(str).textValue());
@@ -67,10 +68,15 @@ public class Yaml {
             new Builtin.Builtin1(
                     "yaml.marshal",
                     (OpaWasm instance, int strAddr) -> {
-                        var str = dumpJson(instance, strAddr);
+                        int resultYamlAddr = instance.opaJsonDump(strAddr);
+                        var yamlStr = instance.memory().readCString(resultYamlAddr);
+                        instance.opaFree(resultYamlAddr);
                         try {
-                            var tree = jsonMapper.readTree(str);
-                            return loadJson(instance, yamlMapper.writeValueAsString(tree));
+                            var yaml = yamlMapper.readTree(yamlStr);
+                            var resultStr = yamlMapper.writeValueAsString(yaml);
+                            var resultStrAddr = instance.opaMalloc(resultStr.length());
+                            instance.memory().writeCString(resultStrAddr, resultStr);
+                            return resultStrAddr;
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
                         }
