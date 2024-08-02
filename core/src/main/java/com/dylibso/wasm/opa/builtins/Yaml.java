@@ -53,7 +53,8 @@ public class Yaml {
                     var jsonStr = jsonMapper.writeValueAsString(tree);
                     return jsonStr;
                 } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                    // should ignore errors here ...
+                    return "";
                 }
             }
         } catch (JsonProcessingException e) {

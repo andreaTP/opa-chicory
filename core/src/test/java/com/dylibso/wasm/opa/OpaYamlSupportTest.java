@@ -1,7 +1,9 @@
 package com.dylibso.wasm.opa;
 
 import static com.dylibso.wasm.opa.Utils.getResult;
+import static com.dylibso.wasm.opa.Utils.objectMapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.dylibso.wasm.opa.builtins.Yaml;
@@ -37,37 +39,42 @@ public class OpaYamlSupportTest {
         assertTrue(result.asBoolean());
     }
 
-    //
-    //    it("should ignore YAML syntax errors", () => {
-    //        expect(() => policy.evaluate({}, "yaml/support/hasSyntaxError")).not
-    //                .toThrow();
-    //    const result = policy.evaluate({}, "yaml/support/hasSyntaxError");
-    //        expect(result.length).toBe(0);
-    //    });
-    //
-    //    it("should ignore YAML semantic errors", () => {
-    //        expect(() => policy.evaluate({}, "yaml/support/hasSemanticError")).not
-    //                .toThrow();
-    //    const result = policy.evaluate({}, "yaml/support/hasSemanticError");
-    //        expect(result.length).toBe(0);
-    //    });
-    //
-    //    it("should ignore YAML reference errors", () => {
-    //        expect(() => policy.evaluate({}, "yaml/support/hasReferenceError")).not
-    //                .toThrow();
-    //    const result = policy.evaluate({}, "yaml/support/hasReferenceError");
-    //        expect(result.length).toBe(0);
-    //    });
-    //
-    //    it("should ignore YAML warnings", () => {
-    //        expect(() => policy.evaluate({}, "yaml/support/hasYAMLWarning")).not
-    //                .toThrow();
-    //    const result = policy.evaluate({}, "yaml/support/hasYAMLWarning");
-    //        expect(result.length).toBe(0);
-    //    });
+    @Test
+    public void shouldIgnoreYamlSyntaxErrors() throws Exception {
+        var result =
+                objectMapper.readTree(policy.entrypoint("yaml/support/hasSyntaxError").evaluate());
+        assertTrue(result.isArray());
+        assertFalse(result.elements().hasNext());
+    }
 
     @Test
-    public void shouldMarshalYaml() throws Exception {
+    public void shouldIgnoreYamlSemanticErrors() throws Exception {
+        var result =
+                objectMapper.readTree(
+                        policy.entrypoint("yaml/support/hasSemanticError").evaluate());
+        assertTrue(result.isArray());
+        assertFalse(result.elements().hasNext());
+    }
+
+    @Test
+    public void shouldIgnoreYamlReferenceErrors() throws Exception {
+        var result =
+                objectMapper.readTree(
+                        policy.entrypoint("yaml/support/hasReferenceError").evaluate());
+        assertTrue(result.isArray());
+        assertFalse(result.elements().hasNext());
+    }
+
+    @Test
+    public void shouldIgnoreYamlWarnings() throws Exception {
+        var result =
+                objectMapper.readTree(policy.entrypoint("yaml/support/hasYAMLWarning").evaluate());
+        assertTrue(result.isArray());
+        assertFalse(result.elements().hasNext());
+    }
+
+    @Test
+    public void shouldMarshalYaml() {
         var result =
                 getResult(
                         policy.entrypoint("yaml/support/canMarshalYAML")
@@ -80,7 +87,7 @@ public class OpaYamlSupportTest {
     }
 
     @Test
-    public void shouldValidateYaml() throws Exception {
+    public void shouldValidateYaml() {
         var result = getResult(policy.entrypoint("yaml/support/isValidYAML").evaluate("{}"));
         assertTrue(result.asBoolean());
     }
