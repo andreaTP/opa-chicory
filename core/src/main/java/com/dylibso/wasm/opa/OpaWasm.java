@@ -351,4 +351,20 @@ public class OpaWasm {
                         Value.i32(heapPtr),
                         Value.i32(format));
     }
+
+    // helper functions
+    public String readString(int addr) {
+        int resultAddr = opaJsonDump(addr);
+        var resultStr = memory().readCString(resultAddr);
+        opaFree(resultAddr);
+        return resultStr;
+    }
+
+    public int writeResult(String result) {
+        var resultStrAddr = opaMalloc(result.length());
+        memory().writeCString(resultStrAddr, result);
+        var resultAddr = opaJsonParse(resultStrAddr, result.length());
+        opaFree(resultStrAddr);
+        return resultAddr;
+    }
 }
