@@ -7,12 +7,11 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.io.FileUtils;
 
 public class OpaCli {
 
     public static Path baseSourceFolder = Path.of("src", "test", "resources", "fixtures");
-    private static Path baseDestFolder = Path.of("target", "compiled-policies");
+    public static Path baseDestFolder = Path.of("target", "compiled-policies");
 
     private static String bundleName = "bundle.tar.gz";
 
@@ -25,18 +24,7 @@ public class OpaCli {
     public static Path compile(String regoFolder, boolean capabilities, String... entrypoints)
             throws IOException {
         var sourceFolder = baseSourceFolder.resolve(regoFolder);
-        var plainName =
-                Files.list(sourceFolder)
-                        .filter(f -> f.toFile().getName().endsWith(".rego"))
-                        .findFirst()
-                        .get()
-                        .toFile()
-                        .getName()
-                        .replace(".rego", "");
         var targetFolder = baseDestFolder.resolve(regoFolder);
-        if (targetFolder.toFile().exists()) {
-            FileUtils.deleteDirectory(targetFolder.toFile());
-        }
         targetFolder.toFile().mkdirs();
         var targetBundle = baseDestFolder.resolve(regoFolder).resolve(bundleName);
 
@@ -100,14 +88,17 @@ public class OpaCli {
             Path.of("src", "test", "resources", "capabilities.json");
 
     public static void prepareTestcases() {
+        var testcasesTarPath = Path.of("..", testcasesTar);
+        testcasesDestFolder.toFile().mkdirs();
         try {
             Files.copy(
-                    Path.of("..", testcasesTar),
+                    testcasesTarPath,
                     testcasesDestFolder.resolve(testcasesTar),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException(
-                    "testcases.tar.gz file not found in root, please download it ... let figure out"
+                    testcasesTarPath.toFile().getAbsolutePath()
+                            + " file not found in root, please download it ... let figure out"
                             + " how!",
                     e);
         }

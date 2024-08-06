@@ -2,6 +2,7 @@ package com.github.andreaTP.opa.chicory;
 
 import com.dylibso.chicory.runtime.Memory;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Map;
 
 // final user API
 // directly porting:
@@ -99,6 +101,15 @@ public class Opa {
             return this;
         }
 
+        public OpaPolicy data(JsonNode data) {
+            try {
+                return data(jsonMapper.writeValueAsString(data));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(
+                        "Failed to serialize the provided data to Json: " + data, e);
+            }
+        }
+
         public OpaPolicy input(String input) {
             var inputLen = input.getBytes().length;
             var delta = this.dataHeapPtr + inputLen - (wasm.memory().pages() * Memory.PAGE_SIZE);
@@ -115,6 +126,20 @@ public class Opa {
             return this;
         }
 
+        public Map<String, Integer> entrypoints() {
+            try {
+                var json = dumpJson(wasm.entrypoints());
+                var entrypoints =
+                        jsonMapper.readValue(
+                                json, new TypeReference<HashMap<String, Integer>>() {});
+                return entrypoints;
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(
+                        "Failed to parse the response from \"entrypoints()\"", e);
+            }
+        }
+
+        // TODO: re-use the implementation above?
         public int findEntrypoint(String name) {
             try {
                 var json = dumpJson(wasm.entrypoints());

@@ -63,7 +63,7 @@ public class OpaDefaultImports implements OpaImports {
     @Override
     public void opaAbort(OpaWasm instance, int ptr) {
         var errorMessage = instance.memory().readCString(ptr);
-        throw new RuntimeException("opa_abort - " + errorMessage);
+        throw new OpaAbortException("opa_abort - " + errorMessage);
     }
 
     @Override
