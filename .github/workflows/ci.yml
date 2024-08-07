@@ -21,7 +21,7 @@ jobs:
       matrix:
         java-version: [11, 17, 21]
         opa-version:
-        - v0.67.1 # latest - verify how to upgrade it
+        - 0.67.1 # latest - verify how to upgrade it
 
     steps:
     - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: open-policy-agent/opa
-        ref: ${{ matrix.opa-version }}
+        ref: v${{ matrix.opa-version }}
         path: opa
     - name: Prep OPA cases
       working-directory: opa
@@ -46,10 +46,10 @@ jobs:
         java-version: '${{ matrix.java-version }}'
         cache: maven
 
-    - name: Install Open Policy Agent ${{ matrix.opa-version }}
+    - name: Install Open Policy Agent v${{ matrix.opa-version }}
       uses: open-policy-agent/setup-opa@v2
       with:
-        version: v${{ matrix.opa-version }}
+        version: ${{ matrix.opa-version }}
 
     - name: Test OPA-Chicory
       run: mvn spotless:apply install
