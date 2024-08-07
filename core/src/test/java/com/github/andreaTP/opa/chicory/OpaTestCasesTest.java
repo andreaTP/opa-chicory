@@ -24,14 +24,12 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-// TODO: implement me
-// this should iterate over "testcases"
-// testcases.tar.gz
-// @Disabled
+@DisabledIfEnvironmentVariable(named = "OPA_TESTSUITE", matches = "disabled")
 public class OpaTestCasesTest {
     static ObjectMapper mapper = new ObjectMapper();
 

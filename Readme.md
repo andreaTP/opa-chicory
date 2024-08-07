@@ -18,6 +18,12 @@ There are only a couple of steps required to start evaluating the policy.
 
 To run the tests you need the `opa` cli available on the `PATH` and `tar`.
 
+## Build:
+
+```
+OPA_TESTSUITE=disabled mvn spotless:apply install
+```
+
 ## Builtins:
 
 We should have a section like this:

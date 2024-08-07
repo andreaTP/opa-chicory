@@ -32,10 +32,12 @@ jobs:
         repository: open-policy-agent/opa
         ref: v${{ matrix.opa-version }}
         path: opa
+
     - name: Prep OPA cases
       working-directory: opa
       # TODO: This make target runs the tests, improve it
       run: make wasm-rego-test
+
     - name: Copy OPA cases
       run: mv opa/.go/cache/testcases.tar.gz opa-chicory
 
