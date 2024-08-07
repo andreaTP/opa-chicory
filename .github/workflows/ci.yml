@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# When a new revision is pushed to a PR, cancel all in-progress CI runs for that
+# PR. See https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [11, 17, 21]
+        opa-version:
+        - v0.67.1 # latest - verify how to upgrade it
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Checkout OPA v${{ matrix.opa-version }}
+      uses: actions/checkout@v4
+      with:
+        repository: open-policy-agent/opa
+        ref: ${{ matrix.opa-version }}
+        path: opa
+    - run: mkdir test/cases
+    - name: Prep OPA cases
+      working-directory: opa
+      # TODO: This make target runs the tests, improve it
+      run: make wasm-rego-test
+    - name: Copy OPA cases
+      run: mv opa/.go/cache/testcases.tar.gz opa-chicory
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '${{ matrix.java-version }}'
+        cache: maven
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install Open Policy Agent ${{ matrix.opa-version }}
+      uses: open-policy-agent/setup-opa@v2
+      with:
+        version: v${{ matrix.opa-version }}
+    - run: mvn spotless:apply install
