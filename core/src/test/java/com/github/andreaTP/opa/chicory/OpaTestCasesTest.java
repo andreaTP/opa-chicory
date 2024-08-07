@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.dylibso.chicory.runtime.exceptions.WASMMachineException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.IntNode;
@@ -21,7 +23,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -88,6 +89,57 @@ public class OpaTestCasesTest {
         return allTests.stream().map(f -> Arguments.of(f));
     }
 
+    private boolean checkSingleResult(Opa.OpaPolicy policy, JsonNode input, JsonNode expected) {
+        try {
+            var sortedExpected =
+                    mapper.writeValueAsString(mapper.treeToValue(expected, Object.class));
+
+            String result = null;
+            if (input == null) {
+                // TODO: review the most sensitive default for the SDK itself
+                result = policy.evaluate("");
+            } else {
+                result = policy.evaluate(input);
+            }
+
+            var results = mapper.readTree(result).elements();
+            while (results.hasNext()) {
+                var strResult =
+                        mapper.writeValueAsString(mapper.treeToValue(results.next(), Object.class));
+
+                if (sortedExpected.equals(strResult)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void assertSingleResult(Opa.OpaPolicy policy, JsonNode input, JsonNode expected) {
+        try {
+            var sortedExpected =
+                    mapper.writeValueAsString(mapper.treeToValue(expected, Object.class));
+
+            String result = null;
+            if (input == null) {
+                // TODO: review the most sensitive default for the SDK itself
+                result = policy.evaluate("");
+            } else {
+                result = policy.evaluate(input);
+            }
+
+            var firstResult =
+                    mapper.writeValueAsString(
+                            mapper.treeToValue(
+                                    mapper.readTree(result).elements().next(), Object.class));
+            assertEquals(sortedExpected, firstResult);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @ParameterizedTest
     @MethodSource("walkTestcasesFolder")
     void externalTestcases(TestCaseData data) throws Exception {
@@ -95,6 +147,7 @@ public class OpaTestCasesTest {
         assertEquals(1, policy.entrypoints().size());
 
         if (data.getCase().data() == null) {
+            // TODO: review the most sensitive default for the SDK itself
             policy.data("");
         } else {
             policy.data(data.getCase().data());
@@ -122,26 +175,18 @@ public class OpaTestCasesTest {
                             + " doesn't contain the expected text: "
                             + data.getCase().wantError());
         } else if (data.getCase().wantResult() != null && data.getCase().wantResult().length > 0) {
-            // TODO: implement support for multiple results
-            Assumptions.assumeTrue(
-                    data.getCase().wantResult().length == 1,
-                    "support for multiple results is not implemented yet");
-
-            var expected = data.getCase().wantResult();
-            var sortedExpected =
-                    mapper.writeValueAsString(mapper.treeToValue(expected[0], Object.class));
-            String result = null;
-            if (data.getCase().input() == null) {
-                result = policy.evaluate("");
+            if (data.getCase().wantResult().length == 1) {
+                assertSingleResult(policy, data.getCase().input(), data.getCase().wantResult()[0]);
             } else {
-                result = policy.evaluate(data.getCase().input());
-            }
+                int found = 0;
+                for (var expected : data.getCase().wantResult()) {
+                    if (checkSingleResult(policy, data.getCase().input(), expected)) {
+                        found++;
+                    }
+                }
 
-            var firstResult =
-                    mapper.writeValueAsString(
-                            mapper.treeToValue(
-                                    mapper.readTree(result).elements().next(), Object.class));
-            assertEquals(sortedExpected, firstResult);
+                assertEquals(data.getCase().wantResult().length, found);
+            }
         } else if (data.getCase().wantDefined()) {
             var result = policy.evaluate(data.getCase().input());
 
