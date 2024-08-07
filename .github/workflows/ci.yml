@@ -41,7 +41,7 @@ jobs:
       matrix:
         java-version: [11, 17, 21]
         opa-version:
-        - 0.67.1 # latest - verify how to upgrade it
+        - 0.67.1 # latest
 
     steps:
     - uses: actions/checkout@v4
@@ -63,4 +63,4 @@ jobs:
         version: ${{ matrix.opa-version }}
 
     - name: Test OPA-Chicory
-      run: mvn spotless:apply clean install
+      run: mvn -B spotless:apply clean install
