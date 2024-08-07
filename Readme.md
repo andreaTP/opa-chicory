@@ -28,3 +28,9 @@ OPA_TESTSUITE=disabled mvn spotless:apply install
 
 We should have a section like this:
 https://github.com/me-viper/OpaDotNet/blob/739b69ed22936455d1aa60909d8106184ef45c7f/docs/articles/Builtins.md
+
+## TODO:
+
+- CI - in progress
+- Docs - to do
+- ?

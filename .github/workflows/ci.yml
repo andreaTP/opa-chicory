@@ -54,4 +54,4 @@ jobs:
         version: ${{ matrix.opa-version }}
 
     - name: Test OPA-Chicory
-      run: mvn spotless:apply install
+      run: mvn spotless:apply clean install
