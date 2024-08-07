@@ -32,7 +32,6 @@ jobs:
         repository: open-policy-agent/opa
         ref: ${{ matrix.opa-version }}
         path: opa
-    - run: mkdir test/cases
     - name: Prep OPA cases
       working-directory: opa
       # TODO: This make target runs the tests, improve it
