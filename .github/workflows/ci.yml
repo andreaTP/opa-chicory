@@ -34,7 +34,7 @@ jobs:
         path: opa/.go/cache/testcases.tar.gz
 
   build:
-    dependsOn: prepare-testsuite
+    needs: prepare-testsuite
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
