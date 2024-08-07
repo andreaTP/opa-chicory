@@ -89,7 +89,7 @@ public class OpaTestCasesTest {
         return allTests.stream().map(f -> Arguments.of(f));
     }
 
-    private boolean checkSingleResult(Opa.OpaPolicy policy, JsonNode input, JsonNode expected) {
+    private boolean findResult(Opa.OpaPolicy policy, JsonNode input, JsonNode expected) {
         try {
             var sortedExpected =
                     mapper.writeValueAsString(mapper.treeToValue(expected, Object.class));
@@ -180,7 +180,7 @@ public class OpaTestCasesTest {
             } else {
                 int found = 0;
                 for (var expected : data.getCase().wantResult()) {
-                    if (checkSingleResult(policy, data.getCase().input(), expected)) {
+                    if (findResult(policy, data.getCase().input(), expected)) {
                         found++;
                     }
                 }
