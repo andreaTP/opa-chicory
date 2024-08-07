@@ -47,12 +47,10 @@ jobs:
         java-version: '${{ matrix.java-version }}'
         cache: maven
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
     - name: Install Open Policy Agent ${{ matrix.opa-version }}
       uses: open-policy-agent/setup-opa@v2
       with:
         version: v${{ matrix.opa-version }}
-    - run: mvn spotless:apply install
+
+    - name: Test OPA-Chicory
+      run: mvn spotless:apply install
