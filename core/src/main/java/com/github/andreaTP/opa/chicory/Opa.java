@@ -158,11 +158,11 @@ public class Opa {
         public String evaluate() {
             var ctxAddr = wasm.opaEvalCtxNew();
             if (this.dataAddr == -1) {
-                data("{}");
+                data("");
             }
             wasm.opaEvalCtxSetData(ctxAddr, this.dataAddr);
             if (this.inputAddr == -1) {
-                input("{}");
+                input("");
             }
             wasm.opaEvalCtxSetInput(ctxAddr, this.inputAddr);
             wasm.opaEvalCtxSetEntrypoint(ctxAddr, this.entrypoint);

@@ -8,15 +8,17 @@ import java.util.Map;
 // to be implemented by the user
 public class OpaDefaultImports implements OpaImports {
     // TODO: review the default min, max limits
+    private static final int DEFAULT_MEMORY_INITIAL = 10;
+    private static final int DEFAULT_MEMORY_MAX = MemoryLimits.MAX_PAGES;
     protected final Memory memory;
     protected OpaBuiltin.Builtin[] builtins = new OpaBuiltin.Builtin[0];
 
     public OpaDefaultImports() {
-        this(10, MemoryLimits.MAX_PAGES);
+        this(DEFAULT_MEMORY_INITIAL, DEFAULT_MEMORY_MAX);
     }
 
     public OpaDefaultImports(OpaBuiltin.Builtin... builtins) {
-        this(10, MemoryLimits.MAX_PAGES, builtins);
+        this(DEFAULT_MEMORY_INITIAL, DEFAULT_MEMORY_MAX, builtins);
     }
 
     public OpaDefaultImports(int initial, int maximum) {
