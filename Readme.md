@@ -85,7 +85,8 @@ Example:
 ```java
 input = '{"path": "/", "role": "admin"}';
 
-var result = Opa.loadPolicy(policyWasm).evaluate(input);
+var policy = Opa.loadPolicy(policyWasm);
+var result = policy.evaluate(input);
 System.out.println("Result is: " + result);
 ```
 
