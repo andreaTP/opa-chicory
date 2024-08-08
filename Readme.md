@@ -80,10 +80,6 @@ APIs for policy evaluation:
 - `input` parameter MAY be an `object`, primitive literal or `ArrayBuffer`,
   which assumed to be a well-formed stringified JSON
 
-> `ArrayBuffer` supported in the APIs above as a performance optimisation
-> feature, given that either network or file system provided contents can easily
-> be represented as `ArrayBuffer` in a very performant way.
-
 Example:
 
 ```java
@@ -97,6 +93,18 @@ System.out.println("Result is: " + result);
 > contain a `result` key with the value of the compiled entrypoint. See
 > [https://www.openpolicyagent.org/docs/latest/wasm/](https://www.openpolicyagent.org/docs/latest/wasm/)
 > for more details.
+
+## Builtins support:
+
+At the moment we support the following builtins:
+
+- Json
+    - `json.is_valid`
+
+- Yaml
+    - `yaml.is_valid`
+    - `yaml.marshal`
+    - `yaml.unmarshal`
 
 ### Writing the policy
 
@@ -121,24 +129,23 @@ binary included. See [./examples](./examples) for a more comprehensive example.
 
 See `opa build --help` for more details.
 
+## Development
 
-## Requirements:
+To develop this library you need to have installed the following tools:
 
-To run the tests you need the `opa` cli available on the `PATH` and `tar`.
+- Java 11+
+- Maven
+- the `opa` cli
+- `tar`
 
-## Build:
+the typical command to build and run the tests is:
 
+```bash
+mvn spotless:apply clean install
 ```
+
+to disable the tests based on the Opa testsuite:
+
+```bash
 OPA_TESTSUITE=disabled mvn spotless:apply install
 ```
-
-## Builtins:
-
-We should have a section like this:
-https://github.com/me-viper/OpaDotNet/blob/739b69ed22936455d1aa60909d8106184ef45c7f/docs/articles/Builtins.md
-
-## TODO:
-
-- CI - in progress
-- Docs - to do
-- ?
