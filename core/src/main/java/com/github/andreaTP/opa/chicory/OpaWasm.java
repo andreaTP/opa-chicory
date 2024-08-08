@@ -352,7 +352,7 @@ public class OpaWasm {
                         Value.i32(format));
     }
 
-    // helper functions
+    // helper functions - can be written by the end user
     public String readString(int addr) {
         int resultAddr = opaJsonDump(addr);
         var resultStr = memory().readCString(resultAddr);

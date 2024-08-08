@@ -77,7 +77,7 @@ public class Opa {
             return this;
         }
 
-        public int loadJson(String data) {
+        private int loadJson(String data) {
             var dataStrAddr = wasm.opaMalloc(data.length());
             wasm.memory().writeCString(dataStrAddr, data);
             var dstAddr = wasm.opaJsonParse(dataStrAddr, data.length());
@@ -85,7 +85,7 @@ public class Opa {
             return dstAddr;
         }
 
-        public String dumpJson(int addr) {
+        private String dumpJson(int addr) {
             int resultStrAddr = wasm.opaJsonDump(addr);
             var result = wasm.memory().readCString(resultStrAddr);
             wasm.opaFree(resultStrAddr);
