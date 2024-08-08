@@ -6,8 +6,8 @@
     <artifactId>opa-chicory-parent</artifactId>
     <version>999-SNAPSHOT</version>
   </parent>
-  <artifactId>opa-chicory</artifactId>
-  <name>Opa on chicory</name>
+  <artifactId>opa-chicory-core</artifactId>
+  <name>Opa Wasm Chicory</name>
   <dependencies>
     <dependency>
       <groupId>com.dylibso.chicory</groupId>

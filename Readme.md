@@ -18,7 +18,7 @@ We want fast in-process OPA policies evaluations, and avoid network bottlenecks 
 
 ## Install the module
 
-With Maven:
+With Maven, add Jitpack to the `repositories` section:
 
 ```
 <repositories>
@@ -29,7 +29,7 @@ With Maven:
 </repositories>
 ```
 
-and:
+and add the core module dependency:
 
 ```
 <dependency>
@@ -43,7 +43,84 @@ and:
 
 There are only a couple of steps required to start evaluating the policy.
 
-...
+### Import the module
+
+```java
+import com.github.andreaTP.opa.chicory.Opa;
+```
+
+### Load the policy
+
+```java
+var policy = Opa.loadPolicy(policyWasm);
+```
+
+The `policyWasm` ca be a variety of things, including raw byte array, `InputStream`, `Path`, `File`.
+The content should be the compiled policy Wasm file, a valid WebAssembly module.
+
+For example:
+
+```java
+var policy = Opa.loadPolicy(new File("policy.wasm"));
+```
+
+### Evaluate the Policy
+
+The `OpaPolicy` object returned from `loadPolicy()` has a couple of important
+APIs for policy evaluation:
+
+`data(data)` -- Provide an external `data` document for policy evaluation.
+
+- `data` MUST be a serializable object or `ArrayBuffer`, which assumed to be a
+  well-formed stringified JSON
+
+`evaluate(input)` -- Evaluates the policy using any loaded data and the supplied
+`input` document.
+
+- `input` parameter MAY be an `object`, primitive literal or `ArrayBuffer`,
+  which assumed to be a well-formed stringified JSON
+
+> `ArrayBuffer` supported in the APIs above as a performance optimisation
+> feature, given that either network or file system provided contents can easily
+> be represented as `ArrayBuffer` in a very performant way.
+
+Example:
+
+```java
+input = '{"path": "/", "role": "admin"}';
+
+var result = Opa.loadPolicy(policyWasm).evaluate(input);
+System.out.println("Result is: " + result);
+```
+
+> For any `opa build` created WASM binaries the result set, when defined, will
+> contain a `result` key with the value of the compiled entrypoint. See
+> [https://www.openpolicyagent.org/docs/latest/wasm/](https://www.openpolicyagent.org/docs/latest/wasm/)
+> for more details.
+
+### Writing the policy
+
+See
+[https://www.openpolicyagent.org/docs/latest/how-do-i-write-policies/](https://www.openpolicyagent.org/docs/latest/how-do-i-write-policies/)
+
+### Compiling the policy
+
+Either use the
+[Compile REST API](https://www.openpolicyagent.org/docs/latest/rest-api/#compile-api)
+or `opa build` CLI tool.
+
+For example:
+
+```bash
+opa build -t wasm -e example/allow example.rego
+```
+
+Which is compiling the `example.rego` policy file with the result set to
+`data.example.allow`. The result will be an OPA bundle with the `policy.wasm`
+binary included. See [./examples](./examples) for a more comprehensive example.
+
+See `opa build --help` for more details.
+
 
 ## Requirements:
 
