@@ -96,7 +96,7 @@ System.out.println("Result is: " + result);
 
 ## Builtins support:
 
-At the moment we support the following builtins:
+At the moment the following builtins are supported(and, by default, automatically injected when needed):
 
 - Json
     - `json.is_valid`
