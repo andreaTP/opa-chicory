@@ -63,7 +63,7 @@ public class OpaCustomBuiltinsTest {
                                         "custom_builtins/four_arg",
                                         "custom_builtins/valid_json")
                                 .resolve("policy.wasm"),
-                        new OpaDefaultImports(customBuiltins));
+                        OpaDefaultImports.builder().addBuiltins(customBuiltins).build());
     }
 
     @Test

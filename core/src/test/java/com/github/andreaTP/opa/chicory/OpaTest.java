@@ -18,7 +18,7 @@ public class OpaTest {
 
     @Test
     public void lowLevelAPI() throws Exception {
-        var imports = new OpaDefaultImports();
+        var imports = OpaDefaultImports.builder().build();
         var opa = new OpaWasm(imports, new FileInputStream(wasmFile.toFile()));
 
         assertEquals(opa.opaWasmAbiVersion(), 1);

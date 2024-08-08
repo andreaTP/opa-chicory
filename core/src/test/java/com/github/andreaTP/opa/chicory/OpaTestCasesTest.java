@@ -141,7 +141,10 @@ public class OpaTestCasesTest {
     @ParameterizedTest
     @MethodSource("walkTestcasesFolder")
     void externalTestcases(TestCaseData data) throws Exception {
-        var policy = Opa.loadPolicy(data.getPolicy(), new OpaDefaultImports(customBuiltins));
+        var policy =
+                Opa.loadPolicy(
+                        data.getPolicy(),
+                        OpaDefaultImports.builder().addBuiltins(customBuiltins).build());
         assertEquals(1, policy.entrypoints().size());
 
         if (data.getCase().data() == null) {

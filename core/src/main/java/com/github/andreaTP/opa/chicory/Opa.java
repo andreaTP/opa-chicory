@@ -139,20 +139,13 @@ public class Opa {
             }
         }
 
-        // TODO: re-use the implementation above?
         public int findEntrypoint(String name) {
-            try {
-                var json = dumpJson(wasm.entrypoints());
-                var entrypoints = jsonMapper.readTree(json);
-                if (!entrypoints.has(name)) {
-                    throw new IllegalArgumentException(
-                            "Entrypoint " + name + " is not defined in this policy");
-                }
-                return entrypoints.findValue(name).asInt();
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(
-                        "Failed to parse the response from \"entrypoints()\"", e);
+            var entrypoints = entrypoints();
+            if (!entrypoints.containsKey(name)) {
+                throw new IllegalArgumentException(
+                        "Entrypoint " + name + " is not defined in this policy");
             }
+            return entrypoints.get(name);
         }
 
         public String evaluate() {
@@ -194,7 +187,7 @@ public class Opa {
     }
 
     public static OpaPolicy loadPolicy(InputStream input) {
-        return loadPolicy(input, new OpaDefaultImports());
+        return loadPolicy(input, OpaDefaultImports.builder().build());
     }
 
     public static OpaPolicy loadPolicy(ByteBuffer buffer) {

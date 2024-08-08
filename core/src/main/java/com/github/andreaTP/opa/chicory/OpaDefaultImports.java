@@ -3,6 +3,8 @@ package com.github.andreaTP.opa.chicory;
 import com.dylibso.chicory.runtime.Memory;
 import com.dylibso.chicory.wasm.types.MemoryLimits;
 import com.github.andreaTP.opa.chicory.builtins.Provided;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 // to be implemented by the user
@@ -12,21 +14,12 @@ public class OpaDefaultImports implements OpaImports {
     private static final int DEFAULT_MEMORY_MAX = MemoryLimits.MAX_PAGES;
     protected final Memory memory;
     protected OpaBuiltin.Builtin[] builtins = new OpaBuiltin.Builtin[0];
+    protected boolean defaultBuiltins = true;
 
-    public OpaDefaultImports() {
-        this(DEFAULT_MEMORY_INITIAL, DEFAULT_MEMORY_MAX);
-    }
-
-    public OpaDefaultImports(OpaBuiltin.Builtin... builtins) {
-        this(DEFAULT_MEMORY_INITIAL, DEFAULT_MEMORY_MAX, builtins);
-    }
-
-    public OpaDefaultImports(int initial, int maximum) {
-        this.memory = new Memory(new MemoryLimits(initial, maximum));
-    }
-
-    public OpaDefaultImports(int initial, int maximum, OpaBuiltin.Builtin... builtins) {
+    private OpaDefaultImports(
+            int initial, int maximum, boolean defaultBuiltins, OpaBuiltin.Builtin[] builtins) {
         this.builtins = builtins;
+        this.defaultBuiltins = defaultBuiltins;
         this.memory = new Memory(new MemoryLimits(initial, maximum));
     }
 
@@ -42,11 +35,13 @@ public class OpaDefaultImports implements OpaImports {
                 result[mappings.get(builtin.name())] = builtin;
             }
         }
-        // provided builtins override anything with clashing name
-        var all = Provided.all();
-        for (var builtin : all) {
-            if (mappings.containsKey(builtin.name())) {
-                result[mappings.get(builtin.name())] = builtin;
+        if (defaultBuiltins) {
+            // provided builtins override anything with clashing name
+            var all = Provided.all();
+            for (var builtin : all) {
+                if (mappings.containsKey(builtin.name())) {
+                    result[mappings.get(builtin.name())] = builtin;
+                }
             }
         }
         this.builtins = result;
@@ -92,5 +87,48 @@ public class OpaDefaultImports implements OpaImports {
     public int opaBuiltin4(
             OpaWasm instance, int builtinId, int ctx, int _1, int _2, int _3, int _4) {
         return builtins[builtinId].asBuiltin4(instance, _1, _2, _3, _4);
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private Builder() {}
+
+        private int memory_initial = DEFAULT_MEMORY_INITIAL;
+        private int memory_max = DEFAULT_MEMORY_MAX;
+        private boolean defaultBuiltins = true;
+        private List<OpaBuiltin.Builtin> builtins = new ArrayList<>();
+
+        public Builder withMemoryInitial(int initial) {
+            this.memory_initial = initial;
+            return this;
+        }
+
+        public Builder withMemoryMax(int max) {
+            this.memory_max = max;
+            return this;
+        }
+
+        public Builder withDefaultBuiltins(boolean defaultBuiltins) {
+            this.defaultBuiltins = defaultBuiltins;
+            return this;
+        }
+
+        public Builder addBuiltins(OpaBuiltin.Builtin... builtins) {
+            for (var builtin : builtins) {
+                this.builtins.add(builtin);
+            }
+            return this;
+        }
+
+        public OpaDefaultImports build() {
+            return new OpaDefaultImports(
+                    memory_initial,
+                    memory_max,
+                    defaultBuiltins,
+                    builtins.toArray(OpaBuiltin.Builtin[]::new));
+        }
     }
 }
