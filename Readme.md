@@ -34,7 +34,7 @@ and add the core module dependency:
 ```
 <dependency>
     <groupId>com.github.andreaTP.opa-chicory</groupId>
-    <artifactId>opa-chicory</artifactId>
+    <artifactId>opa-chicory-core</artifactId>
     <version>main-SNAPSHOT</version>
 </dependency>
 ```
