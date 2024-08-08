@@ -71,14 +71,12 @@ APIs for policy evaluation:
 
 `data(data)` -- Provide an external `data` document for policy evaluation.
 
-- `data` MUST be a serializable object or `ArrayBuffer`, which assumed to be a
-  well-formed stringified JSON
+- `data` MUST be a `String`, which assumed to be a well-formed stringified JSON
 
 `evaluate(input)` -- Evaluates the policy using any loaded data and the supplied
 `input` document.
 
-- `input` parameter MAY be an `object`, primitive literal or `ArrayBuffer`,
-  which assumed to be a well-formed stringified JSON
+- `input` parameter MUST be a `String` serialized `object`, `array` or primitive literal which assumed to be a well-formed stringified JSON
 
 Example:
 
