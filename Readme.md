@@ -3,7 +3,7 @@
 
 # Open Policy Agent WebAssembly Java SDK (experimental)
 
-This is SDK for using WebAssembly (wasm) compiled [Open Policy Agent](https://www.openpolicyagent.org/) policies
+This is an SDK for using WebAssembly (wasm) compiled [Open Policy Agent](https://www.openpolicyagent.org/) policies
 with [Chicory](https://github.com/dylibso/chicory), a pure Java Wasm interpreter.
 
 Initial implementation was based
