@@ -20,7 +20,7 @@ We want fast in-process OPA policies evaluations, and avoid network bottlenecks 
 
 With Maven, add Jitpack to the `repositories` section:
 
-```
+```xml
 <repositories>
     <repository>
         <id>jitpack.io</id>
@@ -31,7 +31,7 @@ With Maven, add Jitpack to the `repositories` section:
 
 and add the core module dependency:
 
-```
+```xml
 <dependency>
     <groupId>com.github.andreaTP.opa-chicory</groupId>
     <artifactId>opa-chicory-core</artifactId>
