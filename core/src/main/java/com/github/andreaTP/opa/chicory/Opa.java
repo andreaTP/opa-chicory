@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,9 +20,9 @@ import java.util.Map;
 // directly porting:
 // https://github.com/open-policy-agent/npm-opa-wasm/blob/main/README.md
 public class Opa {
-
-    // TODO: pass around a concrete instance instead of using a global one
+    // TODO: pass around a concrete instance instead of using a global
     public static ObjectMapper jsonMapper = new ObjectMapper();
+    public static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     public static class OpaPolicy {
         private final OpaWasm wasm;
