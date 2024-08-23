@@ -1,10 +1,6 @@
 package com.github.andreaTP.opa.chicory;
 
-import com.dylibso.chicory.runtime.HostFunction;
-import com.dylibso.chicory.runtime.HostImports;
-import com.dylibso.chicory.runtime.HostMemory;
-import com.dylibso.chicory.runtime.Instance;
-import com.dylibso.chicory.runtime.Memory;
+import com.dylibso.chicory.runtime.*;
 import com.dylibso.chicory.wasm.Parser;
 import com.dylibso.chicory.wasm.types.Value;
 import com.dylibso.chicory.wasm.types.ValueType;
@@ -21,83 +17,48 @@ public class OpaWasm {
         this.imports = imports;
         // Imports
         HostMemory memory = new HostMemory("env", "memory", imports.memory());
-        HostFunction opaAbort =
-                new HostFunction(
-                        (Instance instance, Value... args) -> {
-                            imports.opaAbort(this, args[0].asInt());
-                            return new Value[] {};
-                        },
-                        "env",
-                        "opa_abort",
-                        List.of(ValueType.I32),
-                        List.of());
-        HostFunction opaPrintln =
-                new HostFunction(
-                        (Instance instance, Value... args) -> {
-                            imports.opaPrintln(this, args[0].asInt());
-                            return new Value[] {};
-                        },
-                        "env",
-                        "opa_println",
-                        List.of(ValueType.I32),
-                        List.of());
-        HostFunction opaBuiltin0 =
-                new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin0(
-                                                    this, args[0].asInt(), args[1].asInt()))
-                                },
-                        "env",
+        HostModule hostModule = result();
+        HostModuleInstance hostModuleInstance =
+                HostModuleInstance.builder(hostModule)
+                        .bind("opa_abort", this::opaAbort)
+                        .bind("opa_println", this::opaPrintln)
+                        .bind("opa_builtin0", this::opaBuiltin0)
+                        .bind("opa_builtin1", this::opaBuiltin1)
+                        .bind("opa_builtin2", this::opaBuiltin2)
+                        .bind("opa_builtin3", this::opaBuiltin3)
+                        .bind("opa_builtin4", this::opaBuiltin4)
+                        .build();
+
+        var m = Parser.parse(is);
+        instance =
+                Instance.builder(m)
+                        .withHostImports(
+                                HostImports.builder()
+                                        .addMemory(memory)
+                                        .withFunctions(List.of(hostModuleInstance.hostFunctions()))
+                                        .build())
+                        .build()
+                        .initialize(true);
+    }
+
+    private HostModule result() {
+
+        return HostModule.builder("env")
+                .withFunctionSignature("opa_abort", List.of(ValueType.I32), List.of())
+                .withFunctionSignature("opa_println", List.of(ValueType.I32), List.of())
+                .withFunctionSignature(
                         "opa_builtin0",
                         List.of(ValueType.I32, ValueType.I32),
-                        List.of(ValueType.I32));
-        HostFunction opaBuiltin1 =
-                new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin1(
-                                                    this,
-                                                    args[0].asInt(),
-                                                    args[1].asInt(),
-                                                    args[2].asInt()))
-                                },
-                        "env",
+                        List.of(ValueType.I32))
+                .withFunctionSignature(
                         "opa_builtin1",
                         List.of(ValueType.I32, ValueType.I32, ValueType.I32),
-                        List.of(ValueType.I32));
-        HostFunction opaBuiltin2 =
-                new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin2(
-                                                    this,
-                                                    args[0].asInt(),
-                                                    args[1].asInt(),
-                                                    args[2].asInt(),
-                                                    args[3].asInt()))
-                                },
-                        "env",
+                        List.of(ValueType.I32))
+                .withFunctionSignature(
                         "opa_builtin2",
                         List.of(ValueType.I32, ValueType.I32, ValueType.I32, ValueType.I32),
-                        List.of(ValueType.I32));
-        HostFunction opaBuiltin3 =
-                new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin3(
-                                                    this,
-                                                    args[0].asInt(),
-                                                    args[1].asInt(),
-                                                    args[2].asInt(),
-                                                    args[3].asInt(),
-                                                    args[4].asInt()))
-                                },
-                        "env",
+                        List.of(ValueType.I32))
+                .withFunctionSignature(
                         "opa_builtin3",
                         List.of(
                                 ValueType.I32,
@@ -105,22 +66,8 @@ public class OpaWasm {
                                 ValueType.I32,
                                 ValueType.I32,
                                 ValueType.I32),
-                        List.of(ValueType.I32));
-        HostFunction opaBuiltin4 =
-                new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin4(
-                                                    this,
-                                                    args[0].asInt(),
-                                                    args[1].asInt(),
-                                                    args[2].asInt(),
-                                                    args[3].asInt(),
-                                                    args[4].asInt(),
-                                                    args[5].asInt()))
-                                },
-                        "env",
+                        List.of(ValueType.I32))
+                .withFunctionSignature(
                         "opa_builtin4",
                         List.of(
                                 ValueType.I32,
@@ -129,25 +76,98 @@ public class OpaWasm {
                                 ValueType.I32,
                                 ValueType.I32,
                                 ValueType.I32),
-                        List.of(ValueType.I32));
+                        List.of(ValueType.I32))
+                .build();
+    }
 
-        var m = Parser.parse(is);
-        instance =
-                Instance.builder(m)
-                        .withHostImports(
-                                HostImports.builder()
-                                        .addMemory(memory)
-                                        .addFunction(opaAbort)
-                                        .addFunction(opaPrintln)
-                                        .addFunction(
-                                                opaBuiltin0,
-                                                opaBuiltin1,
-                                                opaBuiltin2,
-                                                opaBuiltin3,
-                                                opaBuiltin4)
-                                        .build())
-                        .build()
-                        .initialize(true);
+    private Value[] opaAbort(Instance instance, Value... args) {
+        this.imports.opaAbort(this, args[0].asInt());
+        return new Value[] {};
+    }
+
+    private Value[] opaPrintln(Instance instance, Value... args) {
+        this.imports.opaPrintln(this, args[0].asInt());
+        return new Value[] {};
+    }
+
+    private Value[] opaBuiltin0(Instance instance, Value... args) {
+        return new Value[] {
+            Value.i32(this.imports.opaBuiltin0(this, args[0].asInt(), args[1].asInt()))
+        };
+    }
+
+    private Value[] opaBuiltin1(Instance instance, Value... args) {
+        return new Value[] {
+            Value.i32(
+                    this.imports.opaBuiltin1(
+                            this, args[0].asInt(), args[1].asInt(), args[2].asInt()))
+        };
+    }
+
+    private Value[] opaBuiltin2(Instance instance, Value... args) {
+        return new Value[] {
+            Value.i32(
+                    this.imports.opaBuiltin2(
+                            this,
+                            args[0].asInt(),
+                            args[1].asInt(),
+                            args[2].asInt(),
+                            args[3].asInt()))
+        };
+    }
+
+    private Value[] opaBuiltin3(Instance instance, Value... args) {
+        return new Value[] {
+            Value.i32(
+                    this.imports.opaBuiltin3(
+                            this,
+                            args[0].asInt(),
+                            args[1].asInt(),
+                            args[2].asInt(),
+                            args[3].asInt(),
+                            args[4].asInt()))
+        };
+    }
+
+    private Value[] opaBuiltin4(Instance instance, Value... args) {
+        return new Value[] {
+            Value.i32(
+                    this.imports.opaBuiltin4(
+                            this,
+                            args[0].asInt(),
+                            args[1].asInt(),
+                            args[2].asInt(),
+                            args[3].asInt(),
+                            args[4].asInt(),
+                            args[5].asInt()))
+        };
+    }
+
+    private static class Result {
+        public final HostFunction opaAbort;
+        public final HostFunction opaPrintln;
+        public final HostFunction opaBuiltin0;
+        public final HostFunction opaBuiltin1;
+        public final HostFunction opaBuiltin2;
+        public final HostFunction opaBuiltin3;
+        public final HostFunction opaBuiltin4;
+
+        public Result(
+                HostFunction opaAbort,
+                HostFunction opaPrintln,
+                HostFunction opaBuiltin0,
+                HostFunction opaBuiltin1,
+                HostFunction opaBuiltin2,
+                HostFunction opaBuiltin3,
+                HostFunction opaBuiltin4) {
+            this.opaAbort = opaAbort;
+            this.opaPrintln = opaPrintln;
+            this.opaBuiltin0 = opaBuiltin0;
+            this.opaBuiltin1 = opaBuiltin1;
+            this.opaBuiltin2 = opaBuiltin2;
+            this.opaBuiltin3 = opaBuiltin3;
+            this.opaBuiltin4 = opaBuiltin4;
+        }
     }
 
     public OpaImports imports() {
