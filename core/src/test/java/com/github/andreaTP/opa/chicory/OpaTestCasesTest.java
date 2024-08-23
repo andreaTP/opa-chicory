@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.dylibso.chicory.runtime.exceptions.WASMMachineException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -163,12 +162,9 @@ public class OpaTestCasesTest {
             // with message: " + exception.getMessage() + " doesn't contain the expected text: " +
             // data.getCase().wantError);
 
-            var wasmException =
+            var exception =
                     assertThrows(
-                            WASMMachineException.class,
-                            () -> policy.evaluate(data.getCase().input()));
-            var exception = wasmException.getCause().getCause();
-            assertTrue(wasmException.getCause().getCause() instanceof OpaAbortException);
+                            OpaAbortException.class, () -> policy.evaluate(data.getCase().input()));
             assertTrue(
                     exception.getMessage().contains(data.getCase().wantError()),
                     "The exception with message: "

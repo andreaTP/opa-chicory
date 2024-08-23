@@ -66,8 +66,17 @@ jobs:
       with:
         version: ${{ matrix.opa-version }}
 
+    - name: Install chicory snapshot
+      run: |
+        git clone https://github.com/evacchi/chicory chicory-snapshot
+        cd chicory-snapshot
+        git checkout wasip1-host-modules
+        mvn -B -Dquickly install
+        cd ..
+        rm -r chicory-snapshot
+
     - name: Test OPA-Chicory
-      run: mvn -B spotless:apply clean install
+      run:  mvn -B spotless:apply clean install
 
     - name: Publish Test Report
       uses: mikepenz/action-junit-report@v4
