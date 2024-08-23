@@ -3,7 +3,6 @@ package com.github.andreaTP.opa.chicory;
 import com.dylibso.chicory.runtime.*;
 import com.dylibso.chicory.wasm.Parser;
 import com.dylibso.chicory.wasm.types.Value;
-import com.dylibso.chicory.wasm.types.ValueType;
 import java.io.InputStream;
 import java.util.List;
 
@@ -31,7 +30,6 @@ public class OpaWasm {
                         .build()
                         .initialize(true);
     }
-
 
     public OpaImports imports() {
         return imports;

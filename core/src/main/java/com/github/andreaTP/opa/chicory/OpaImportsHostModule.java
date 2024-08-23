@@ -2,7 +2,6 @@ package com.github.andreaTP.opa.chicory;
 
 import com.dylibso.chicory.runtime.HostModule;
 import com.dylibso.chicory.wasm.types.ValueType;
-
 import java.util.List;
 
 public class OpaImportsHostModule {

@@ -29,65 +29,64 @@ public class OpaImportsAdapter {
 
     private Value[] opaAbort(Instance instance, Value... args) {
         this.opaImports.opaAbort(this.opaWasm, args[0].asInt());
-        return new Value[]{};
+        return new Value[] {};
     }
 
     private Value[] opaPrintln(Instance instance, Value... args) {
         this.opaImports.opaPrintln(this.opaWasm, args[0].asInt());
-        return new Value[]{};
+        return new Value[] {};
     }
 
     private Value[] opaBuiltin0(Instance instance, Value... args) {
-        return new Value[]{
-                Value.i32(this.opaImports.opaBuiltin0(this.opaWasm, args[0].asInt(), args[1].asInt()))
+        return new Value[] {
+            Value.i32(this.opaImports.opaBuiltin0(this.opaWasm, args[0].asInt(), args[1].asInt()))
         };
     }
 
     private Value[] opaBuiltin1(Instance instance, Value... args) {
-        return new Value[]{
-                Value.i32(
-                        this.opaImports.opaBuiltin1(
-                                this.opaWasm, args[0].asInt(), args[1].asInt(), args[2].asInt()))
+        return new Value[] {
+            Value.i32(
+                    this.opaImports.opaBuiltin1(
+                            this.opaWasm, args[0].asInt(), args[1].asInt(), args[2].asInt()))
         };
     }
 
     private Value[] opaBuiltin2(Instance instance, Value... args) {
-        return new Value[]{
-                Value.i32(
-                        this.opaImports.opaBuiltin2(
-                                this.opaWasm,
-                                args[0].asInt(),
-                                args[1].asInt(),
-                                args[2].asInt(),
-                                args[3].asInt()))
+        return new Value[] {
+            Value.i32(
+                    this.opaImports.opaBuiltin2(
+                            this.opaWasm,
+                            args[0].asInt(),
+                            args[1].asInt(),
+                            args[2].asInt(),
+                            args[3].asInt()))
         };
     }
 
     private Value[] opaBuiltin3(Instance instance, Value... args) {
-        return new Value[]{
-                Value.i32(
-                        this.opaImports.opaBuiltin3(
-                                this.opaWasm,
-                                args[0].asInt(),
-                                args[1].asInt(),
-                                args[2].asInt(),
-                                args[3].asInt(),
-                                args[4].asInt()))
+        return new Value[] {
+            Value.i32(
+                    this.opaImports.opaBuiltin3(
+                            this.opaWasm,
+                            args[0].asInt(),
+                            args[1].asInt(),
+                            args[2].asInt(),
+                            args[3].asInt(),
+                            args[4].asInt()))
         };
     }
 
     private Value[] opaBuiltin4(Instance instance, Value... args) {
-        return new Value[]{
-                Value.i32(
-                        this.opaImports.opaBuiltin4(
-                                this.opaWasm,
-                                args[0].asInt(),
-                                args[1].asInt(),
-                                args[2].asInt(),
-                                args[3].asInt(),
-                                args[4].asInt(),
-                                args[5].asInt()))
+        return new Value[] {
+            Value.i32(
+                    this.opaImports.opaBuiltin4(
+                            this.opaWasm,
+                            args[0].asInt(),
+                            args[1].asInt(),
+                            args[2].asInt(),
+                            args[3].asInt(),
+                            args[4].asInt(),
+                            args[5].asInt()))
         };
     }
-
 }
