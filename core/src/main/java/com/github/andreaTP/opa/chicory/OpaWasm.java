@@ -17,7 +17,7 @@ public class OpaWasm {
         // Imports
         HostMemory memory = new HostMemory("env", "memory", imports.memory());
         OpaImportsAdapter adapter = new OpaImportsAdapter(imports, this);
-        HostModuleInstance hostModuleInstance = adapter.toHostModuleInstance("env");
+        HostModuleInstance env = adapter.toHostModuleInstance("env");
 
         var m = Parser.parse(is);
         instance =
@@ -25,7 +25,7 @@ public class OpaWasm {
                         .withHostImports(
                                 HostImports.builder()
                                         .addMemory(memory)
-                                        .withFunctions(List.of(hostModuleInstance.hostFunctions()))
+                                        .withFunctions(List.of(env.hostFunctions()))
                                         .build())
                         .build()
                         .initialize(true);

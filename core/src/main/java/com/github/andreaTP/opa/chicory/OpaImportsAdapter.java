@@ -1,5 +1,6 @@
 package com.github.andreaTP.opa.chicory;
 
+import com.dylibso.chicory.runtime.HostModule;
 import com.dylibso.chicory.runtime.HostModuleInstance;
 import com.dylibso.chicory.runtime.Instance;
 import com.dylibso.chicory.wasm.types.Value;
@@ -16,7 +17,8 @@ public class OpaImportsAdapter {
 
     public HostModuleInstance toHostModuleInstance(String name) {
         OpaImportsAdapter adapter = new OpaImportsAdapter(opaImports, opaWasm);
-        return HostModuleInstance.builder(OpaImportsHostModule.named(name))
+        HostModule hostModule = OpaImportsHostModule.named(name);
+        return HostModuleInstance.builder(hostModule)
                 .bind("opa_abort", adapter::opaAbort)
                 .bind("opa_println", adapter::opaPrintln)
                 .bind("opa_builtin0", adapter::opaBuiltin0)
