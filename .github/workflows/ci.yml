@@ -76,7 +76,7 @@ jobs:
         rm -r chicory-snapshot
 
     - name: Test OPA-Chicory
-        mvn -B spotless:apply clean install
+      run:  mvn -B spotless:apply clean install
 
     - name: Publish Test Report
       uses: mikepenz/action-junit-report@v4
