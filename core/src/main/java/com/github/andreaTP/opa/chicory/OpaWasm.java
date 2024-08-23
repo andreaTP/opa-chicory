@@ -5,7 +5,7 @@ import com.dylibso.chicory.runtime.HostImports;
 import com.dylibso.chicory.runtime.HostMemory;
 import com.dylibso.chicory.runtime.Instance;
 import com.dylibso.chicory.runtime.Memory;
-import com.dylibso.chicory.runtime.Module;
+import com.dylibso.chicory.wasm.Parser;
 import com.dylibso.chicory.wasm.types.Value;
 import com.dylibso.chicory.wasm.types.ValueType;
 import java.io.InputStream;
@@ -131,8 +131,9 @@ public class OpaWasm {
                                 ValueType.I32),
                         List.of(ValueType.I32));
 
+        var m = Parser.parse(is);
         instance =
-                Module.builder(is)
+                Instance.builder(m)
                         .withHostImports(
                                 HostImports.builder()
                                         .addMemory(memory)
@@ -146,7 +147,7 @@ public class OpaWasm {
                                                 opaBuiltin4)
                                         .build())
                         .build()
-                        .instantiate();
+                        .initialize(true);
     }
 
     public OpaImports imports() {

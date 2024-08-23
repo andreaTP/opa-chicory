@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.dylibso.chicory.runtime.exceptions.WASMMachineException;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,7 +35,7 @@ public class MemoryTest {
                         wasmFile,
                         OpaDefaultImports.builder().withMemoryInitial(3).withMemoryMax(4).build());
         var input = new String(new char[2 * 65536]).replace("\0", "a");
-        var exception = assertThrows(WASMMachineException.class, () -> policy.input(input));
+        var exception = assertThrows(OpaAbortException.class, () -> policy.input(input));
         Assertions.assertEquals(
                 "opa_abort - opa_malloc: failed", Utils.rootCauseMessage(exception));
     }
