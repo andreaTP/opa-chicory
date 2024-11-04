@@ -1,12 +1,11 @@
 package com.github.andreaTP.opa.chicory;
 
 import com.dylibso.chicory.runtime.HostFunction;
-import com.dylibso.chicory.runtime.HostImports;
-import com.dylibso.chicory.runtime.HostMemory;
+import com.dylibso.chicory.runtime.ImportMemory;
+import com.dylibso.chicory.runtime.ImportValues;
 import com.dylibso.chicory.runtime.Instance;
 import com.dylibso.chicory.runtime.Memory;
-import com.dylibso.chicory.runtime.Module;
-import com.dylibso.chicory.wasm.types.Value;
+import com.dylibso.chicory.wasm.Parser;
 import com.dylibso.chicory.wasm.types.ValueType;
 import java.io.InputStream;
 import java.util.List;
@@ -20,83 +19,65 @@ public class OpaWasm {
     public OpaWasm(OpaImports imports, InputStream is) {
         this.imports = imports;
         // Imports
-        HostMemory memory = new HostMemory("env", "memory", imports.memory());
+        ImportMemory memory = new ImportMemory("env", "memory", imports.memory());
         HostFunction opaAbort =
                 new HostFunction(
-                        (Instance instance, Value... args) -> {
-                            imports.opaAbort(this, args[0].asInt());
-                            return new Value[] {};
-                        },
                         "env",
                         "opa_abort",
                         List.of(ValueType.I32),
-                        List.of());
+                        List.of(),
+                        (Instance instance, long... args) -> {
+                            imports.opaAbort(this, (int) args[0]);
+                            return null;
+                        });
         HostFunction opaPrintln =
                 new HostFunction(
-                        (Instance instance, Value... args) -> {
-                            imports.opaPrintln(this, args[0].asInt());
-                            return new Value[] {};
-                        },
                         "env",
                         "opa_println",
                         List.of(ValueType.I32),
-                        List.of());
+                        List.of(),
+                        (Instance instance, long... args) -> {
+                            imports.opaPrintln(this, (int) args[0]);
+                            return null;
+                        });
         HostFunction opaBuiltin0 =
                 new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin0(
-                                                    this, args[0].asInt(), args[1].asInt()))
-                                },
                         "env",
                         "opa_builtin0",
                         List.of(ValueType.I32, ValueType.I32),
-                        List.of(ValueType.I32));
+                        List.of(ValueType.I32),
+                        (Instance instance, long... args) ->
+                                new long[] {
+                                    imports.opaBuiltin0(this, (int) args[0], (int) args[1])
+                                });
         HostFunction opaBuiltin1 =
                 new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin1(
-                                                    this,
-                                                    args[0].asInt(),
-                                                    args[1].asInt(),
-                                                    args[2].asInt()))
-                                },
                         "env",
                         "opa_builtin1",
                         List.of(ValueType.I32, ValueType.I32, ValueType.I32),
-                        List.of(ValueType.I32));
+                        List.of(ValueType.I32),
+                        (Instance instance, long... args) ->
+                                new long[] {
+                                    imports.opaBuiltin1(
+                                            this, (int) args[0], (int) args[1], (int) args[2])
+                                });
         HostFunction opaBuiltin2 =
                 new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin2(
-                                                    this,
-                                                    args[0].asInt(),
-                                                    args[1].asInt(),
-                                                    args[2].asInt(),
-                                                    args[3].asInt()))
-                                },
                         "env",
                         "opa_builtin2",
                         List.of(ValueType.I32, ValueType.I32, ValueType.I32, ValueType.I32),
-                        List.of(ValueType.I32));
+                        List.of(ValueType.I32),
+                        (Instance instance, long... args) ->
+                                new long[] {
+                                    imports.opaBuiltin2(
+                                            this,
+                                            (int) args[0],
+                                            (int) args[1],
+                                            (int) args[2],
+                                            (int) args[3])
+                                });
         HostFunction opaBuiltin3 =
                 new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin3(
-                                                    this,
-                                                    args[0].asInt(),
-                                                    args[1].asInt(),
-                                                    args[2].asInt(),
-                                                    args[3].asInt(),
-                                                    args[4].asInt()))
-                                },
                         "env",
                         "opa_builtin3",
                         List.of(
@@ -105,21 +86,19 @@ public class OpaWasm {
                                 ValueType.I32,
                                 ValueType.I32,
                                 ValueType.I32),
-                        List.of(ValueType.I32));
+                        List.of(ValueType.I32),
+                        (Instance instance, long... args) ->
+                                new long[] {
+                                    imports.opaBuiltin3(
+                                            this,
+                                            (int) args[0],
+                                            (int) args[1],
+                                            (int) args[2],
+                                            (int) args[3],
+                                            (int) args[4])
+                                });
         HostFunction opaBuiltin4 =
                 new HostFunction(
-                        (Instance instance, Value... args) ->
-                                new Value[] {
-                                    Value.i32(
-                                            imports.opaBuiltin4(
-                                                    this,
-                                                    args[0].asInt(),
-                                                    args[1].asInt(),
-                                                    args[2].asInt(),
-                                                    args[3].asInt(),
-                                                    args[4].asInt(),
-                                                    args[5].asInt()))
-                                },
                         "env",
                         "opa_builtin4",
                         List.of(
@@ -129,12 +108,23 @@ public class OpaWasm {
                                 ValueType.I32,
                                 ValueType.I32,
                                 ValueType.I32),
-                        List.of(ValueType.I32));
+                        List.of(ValueType.I32),
+                        (Instance instance, long... args) ->
+                                new long[] {
+                                    imports.opaBuiltin4(
+                                            this,
+                                            (int) args[0],
+                                            (int) args[1],
+                                            (int) args[2],
+                                            (int) args[3],
+                                            (int) args[4],
+                                            (int) args[5])
+                                });
 
         instance =
-                Module.builder(is)
-                        .withHostImports(
-                                HostImports.builder()
+                Instance.builder(Parser.parse(is))
+                        .withImportValues(
+                                ImportValues.builder()
                                         .addMemory(memory)
                                         .addFunction(opaAbort)
                                         .addFunction(opaPrintln)
@@ -145,8 +135,7 @@ public class OpaWasm {
                                                 opaBuiltin3,
                                                 opaBuiltin4)
                                         .build())
-                        .build()
-                        .instantiate();
+                        .build();
     }
 
     public OpaImports imports() {
@@ -159,11 +148,11 @@ public class OpaWasm {
 
     // exports
     public int opaWasmAbiVersion() {
-        return instance.export("opa_wasm_abi_version").apply()[0].asInt();
+        return (int) instance.export("opa_wasm_abi_version").apply()[0];
     }
 
     public int opaWasmAbiMinorVersion() {
-        return instance.export("opa_wasm_abi_minor_version").apply()[0].asInt();
+        return (int) instance.export("opa_wasm_abi_minor_version").apply()[0];
     }
 
     // Exports
@@ -171,115 +160,112 @@ public class OpaWasm {
      * Evaluates the loaded policy with the provided evaluation context. The return value is reserved for future use.
      */
     public OpaErrorCode eval(int ctxAddr) {
-        return OpaErrorCode.fromValue(instance.export("eval").apply(Value.i32(ctxAddr))[0].asInt());
+        return OpaErrorCode.fromValue((int) instance.export("eval").apply(ctxAddr)[0]);
     }
 
     /*
      * Returns the address of a mapping of built-in function names to numeric identifiers that are required by the policy.
      */
     public int builtins() {
-        return instance.export("builtins").apply()[0].asInt();
+        return (int) instance.export("builtins").apply()[0];
     }
 
     /*
      * Returns the address of a mapping of entrypoints to numeric identifiers that can be selected when evaluating the policy.
      */
     public int entrypoints() {
-        return instance.export("entrypoints").apply()[0].asInt();
+        return (int) instance.export("entrypoints").apply()[0];
     }
 
     /*
      * Returns the address of a newly allocated evaluation context.
      */
     public int opaEvalCtxNew() {
-        return instance.export("opa_eval_ctx_new").apply()[0].asInt();
+        return (int) instance.export("opa_eval_ctx_new").apply()[0];
     }
 
     /*
      * Set the input value to use during evaluation. This must be called before each eval() call. If the input value is not set before evaluation, references to the input document result produce no results (i.e., they are undefined.)
      */
     public void opaEvalCtxSetInput(int ctxAddr, int valueAddr) {
-        instance.export("opa_eval_ctx_set_input").apply(Value.i32(ctxAddr), Value.i32(valueAddr));
+        instance.export("opa_eval_ctx_set_input").apply(ctxAddr, valueAddr);
     }
 
     /*
      * Set the data value to use during evaluation. This should be called before each eval() call. If the data value is not set before evaluation, references to base data documents produce no results (i.e., they are undefined.)
      */
     public void opaEvalCtxSetData(int ctxAddr, int valueAddr) {
-        instance.export("opa_eval_ctx_set_data").apply(Value.i32(ctxAddr), Value.i32(valueAddr));
+        instance.export("opa_eval_ctx_set_data").apply(ctxAddr, valueAddr);
     }
 
     /*
      * Set the data value to use during evaluation. This should be called before each eval() call. If the data value is not set before evaluation, references to base data documents produce no results (i.e., they are undefined.)
      */
     public void opaEvalCtxSetEntrypoint(int ctxAddr, int entrypointId) {
-        instance.export("opa_eval_ctx_set_entrypoint")
-                .apply(Value.i32(ctxAddr), Value.i32(entrypointId));
+        instance.export("opa_eval_ctx_set_entrypoint").apply(ctxAddr, entrypointId);
     }
 
     /*
      * Get the result set produced by the evaluation process.
      */
     public int opaEvalCtxGetResult(int ctxAddr) {
-        return instance.export("opa_eval_ctx_get_result").apply(Value.i32(ctxAddr))[0].asInt();
+        return (int) instance.export("opa_eval_ctx_get_result").apply(ctxAddr)[0];
     }
 
     /*
      * Allocates size bytes in the shared memory and returns the starting address.
      */
     public int opaMalloc(int capacity) {
-        return instance.export("opa_malloc").apply(Value.i32(capacity))[0].asInt();
+        return (int) instance.export("opa_malloc").apply(capacity)[0];
     }
 
     /*
      * Free a pointer. Calls opa_abort on error.
      */
     public void opaFree(int addr) {
-        instance.export("opa_free").apply(Value.i32(addr));
+        instance.export("opa_free").apply(addr);
     }
 
     /*
      * Parses the JSON serialized value starting at str_addr of size bytes and returns the address of the parsed value. The parsed value may refer to a null, boolean, number, string, array, or object value.
      */
     public int opaJsonParse(int addr, int size) {
-        return instance.export("opa_json_parse").apply(Value.i32(addr), Value.i32(size))[0].asInt();
+        return (int) instance.export("opa_json_parse").apply(addr, size)[0];
     }
 
     /*
      * The same as opa_json_parse except Rego set literals are supported.
      */
     public int opaValueParse(int addr, int size) {
-        return instance.export("opa_value_parse")
-                .apply(Value.i32(addr), Value.i32(size))[0]
-                .asInt();
+        return (int) instance.export("opa_value_parse").apply(addr, size)[0];
     }
 
     /*
      * Dumps the value referred to by value_addr to a null-terminated JSON serialized string and returns the address of the start of the string. Rego sets are serialized as JSON arrays. Non-string Rego object keys are serialized as strings.
      */
     public int opaJsonDump(int addr) {
-        return instance.export("opa_json_dump").apply(Value.i32(addr))[0].asInt();
+        return (int) instance.export("opa_json_dump").apply(addr)[0];
     }
 
     /*
      * The same as opa_json_dump except Rego sets are serialized using the literal syntax and non-string Rego object keys are not serialized as strings.
      */
     public int opaValueDump(int addr) {
-        return instance.export("opa_value_dump").apply(Value.i32(addr))[0].asInt();
+        return (int) instance.export("opa_value_dump").apply(addr)[0];
     }
 
     /*
      * Set the heap pointer for the next evaluation.
      */
     public void opaHeapPtrSet(int addr) {
-        instance.export("opa_heap_ptr_set").apply(Value.i32(addr));
+        instance.export("opa_heap_ptr_set").apply(addr);
     }
 
     /*
      * Set the heap pointer for the next evaluation.
      */
     public int opaHeapPtrGet() {
-        return instance.export("opa_heap_ptr_get").apply()[0].asInt();
+        return (int) instance.export("opa_heap_ptr_get").apply()[0];
     }
 
     /*
@@ -287,12 +273,9 @@ public class OpaWasm {
      */
     public OpaErrorCode opaValueAddPath(int baseValueAddr, int pathValueAddr, int valueAddr) {
         return OpaErrorCode.fromValue(
-                instance.export("opa_value_add_path")
-                        .apply(
-                                Value.i32(baseValueAddr),
-                                Value.i32(pathValueAddr),
-                                Value.i32(valueAddr))[0]
-                        .asInt());
+                (int)
+                        instance.export("opa_value_add_path")
+                                .apply(baseValueAddr, pathValueAddr, valueAddr)[0]);
     }
 
     /*
@@ -300,16 +283,16 @@ public class OpaWasm {
      */
     public OpaErrorCode opaValueRemovePath(int baseValueAddr, int pathValueAddr) {
         return OpaErrorCode.fromValue(
-                instance.export("opa_value_remove_path")
-                        .apply(Value.i32(baseValueAddr), Value.i32(pathValueAddr))[0]
-                        .asInt());
+                (int)
+                        instance.export("opa_value_remove_path")
+                                .apply(baseValueAddr, pathValueAddr)[0]);
     }
 
     /*
      * Free a value such as one generated by opa_value_parse or opa_json_parse reference at value_addr
      */
     public void opaValueFree(int addr) {
-        instance.export("opa_value_free").apply(Value.i32(addr));
+        instance.export("opa_value_free").apply(addr);
     }
 
     /*
@@ -343,13 +326,13 @@ public class OpaWasm {
         }
         instance.export("opa_heap_blocks_clear")
                 .apply(
-                        Value.i32(0), // reserved for future use
-                        Value.i32(entrypointId),
-                        Value.i32(data),
-                        Value.i32(input),
-                        Value.i32(inputLen),
-                        Value.i32(heapPtr),
-                        Value.i32(format));
+                        0, // reserved for future use
+                        entrypointId,
+                        data,
+                        input,
+                        inputLen,
+                        heapPtr,
+                        format);
     }
 
     // helper functions - can be written by the end user

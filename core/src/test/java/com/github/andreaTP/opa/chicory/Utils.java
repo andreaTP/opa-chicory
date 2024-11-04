@@ -21,14 +21,6 @@ public class Utils {
         }
     }
 
-    public static String rootCauseMessage(Throwable e) {
-        if (e.getCause() == null) {
-            return e.getMessage();
-        } else {
-            return rootCauseMessage(e.getCause());
-        }
-    }
-
     public static String jsonPrettyPrint(String input) {
         try {
             return objectMapper
