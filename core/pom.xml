@@ -10,8 +10,9 @@
   <name>Java Opa Wasm</name>
   <dependencies>
     <dependency>
-      <groupId>com.dylibso.chicory</groupId>
-      <artifactId>runtime</artifactId>
+      <groupId>com.styra.opa</groupId>
+      <artifactId>shaded-chicory</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.dylibso.chicory</groupId>

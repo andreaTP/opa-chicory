@@ -28,6 +28,7 @@
 
   <modules>
     <module>core</module>
+    <module>shaded-chicory</module>
   </modules>
 
   <scm>
