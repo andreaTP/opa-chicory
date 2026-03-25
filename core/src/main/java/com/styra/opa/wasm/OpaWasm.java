@@ -1,6 +1,5 @@
 package com.styra.opa.wasm;
 
-import com.dylibso.chicory.annotations.WasmModuleInterface;
 import com.dylibso.chicory.compiler.MachineFactoryCompiler;
 import com.dylibso.chicory.runtime.Instance;
 import com.dylibso.chicory.runtime.Memory;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 // Low level bindings to OPA
-@WasmModuleInterface("demo-policy.wasm")
 public class OpaWasm implements OpaWasm_ModuleImports, OpaWasm_Env {
     private final Instance instance;
     private final Memory memory;
